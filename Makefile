@@ -6,10 +6,10 @@ TARGET  = build/libcoati.so
 PREFIX  = /usr/local
 
 all:
+	mkdir -p build
 	$(CC) -shared -fPIC $(SOURCES) $(INCLUDE) $(LIBS) -o $(TARGET)
 
 install: $(TARGET)
-	mkdir -p build
 	install $(TARGET) $(PREFIX)/lib
 	install coati.h $(PREFIX)/include
 	ldconfig $(PREFIX)/lib
