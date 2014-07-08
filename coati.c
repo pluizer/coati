@@ -517,14 +517,14 @@ void ct_texture_free(CT_Texture* tex)
 	free(tex);
 }
 
-int ct_texture_is_screen(CT_Texture* tex)
+int ct_is_texture_screen(CT_Texture* tex)
 {
 	return tex->gl_buffer_id == 0;
 }
 
 void ct_texture_size(CT_Texture* texture, float* vect)
 {
-	if (ct_texture_is_screen(texture)) {
+	if (ct_is_texture_screen(texture)) {
 	}
 	vect[0] = (float)texture->w;
 	vect[1] = (float)texture->h;
@@ -535,10 +535,10 @@ static float project_matrix[16];
 static void texture_bind(CT_Texture* tex)
 {
 	glViewport(0, 0, tex->w, tex->h);
-	hpmOrthoFloat(1, ct_texture_is_screen(tex) ? -1 : 1, -100, 100, project_matrix);
+	hpmOrthoFloat(1, ct_is_texture_screen(tex) ? -1 : 1, -100, 100, project_matrix);
 	/* Put origin origin at 0,0 */
 	hpmTranslation(-.5, -.5, 0, project_matrix);
-	hpmScale2D(2, ct_texture_is_screen(tex) ? -2 : 2, project_matrix);
+	hpmScale2D(2, ct_is_texture_screen(tex) ? -2 : 2, project_matrix);
 	shader_upload_projection_matrix(default_shader, project_matrix);
 	glBindFramebuffer(GL_FRAMEBUFFER, tex->gl_buffer_id);
 	CHECK_GL();
@@ -791,7 +791,7 @@ typedef struct
 
 static InputStack pressed_stack, released_stack, holded_stack;
 
-static int _ct_got_quit_event = 0;
+static int _ct_is_quitting = 0;
 
 static int has_key(CT_Key key, InputStack* stack)
 {
@@ -852,22 +852,22 @@ static void reset_stacks()
 	}
 }
 
-int ct_got_quit_event()
+int ct_is_quitting()
 {
-	return _ct_got_quit_event;
+	return _ct_is_quitting;
 }
 
-int ct_key_pressed(CT_Key key)
+int ct_is_key_pressed(CT_Key key)
 {
 	return has_key(key, &pressed_stack);
 }
 
-int ct_key_released(CT_Key key)
+int ct_is_key_released(CT_Key key)
 {
 	return has_key(key, &released_stack);
 }
 
-int ct_key_holded(CT_Key key)
+int ct_is_key_holded(CT_Key key)
 {
 	return has_key(key, &holded_stack);
 }
@@ -901,7 +901,7 @@ void ct_poll_input()
 			key_up_callback(event.key.keysym.sym);
 			break;
 		case SDL_QUIT:
-			_ct_got_quit_event = 1;
+			_ct_is_quitting = 1;
 			break;
 		}
 	}

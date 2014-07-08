@@ -137,7 +137,7 @@ extern CT_Texture* ct_texture_load(const char* filename);
 
 extern void ct_texture_free(CT_Texture* tex);
 
-extern int ct_texture_is_screen(CT_Texture* tex);
+extern int ct_is_texture_screen(CT_Texture* tex);
 
 extern void ct_texture_size(CT_Texture* texture, float* vect);
 
@@ -180,7 +180,7 @@ extern CT_Texture* ct_texture_from_string(CT_Font* font,
 
 /* Input */
 
-extern int ct_got_quit_event();
+extern int ct_is_quitting();
 
 extern int ct_key_pressed(CT_Key key);
 
