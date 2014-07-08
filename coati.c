@@ -59,6 +59,13 @@ static void check_gl_error(const char* func)
 
 /* Shader */
 
+typedef struct
+{
+	unsigned gl_program_id;
+	unsigned gl_vertex_id;
+	unsigned gl_fragment_id;
+} CT_Shader;
+
 const char* vertex_shader_source = 
 	"#version 330\n"
 	"layout (location = 0) in vec2 vertex; "
@@ -170,6 +177,13 @@ static void ct_shader_free(CT_Shader* shader)
 	free(shader);
 }
 
+static CT_Shader* _default_shader;
+
+static CT_Shader* default_shader()
+{
+	return _default_shader;
+}
+
 /* Window */
 
 static CT_Window window = { NULL, "Coati", 0, 1 };
@@ -204,8 +218,8 @@ int ct_window_init()
 	}
 
 	/* Initialise Default Shader */
-	default_shader = ct_shader_create(vertex_shader_source, fragment_shader_source);
-	shader_upload_colour(default_shader, colour_white);
+	_default_shader = ct_shader_create(vertex_shader_source, fragment_shader_source);
+	shader_upload_colour(default_shader(), colour_white);
 	CHECK_GL();
 	return 0;
 }
@@ -213,7 +227,7 @@ int ct_window_init()
 void ct_window_quit()
 {
 	SDL_DestroyWindow(window.sdl_window);
-	ct_shader_free(default_shader);
+	ct_shader_free(default_shader());
 	SDL_Quit();
 }
 
@@ -330,7 +344,7 @@ void ct_push_colour(float* colour)
 	       colour,
 	       sizeof(float)*4);
 	colour_stack.size++;
-	shader_upload_colour(default_shader, colour);
+	shader_upload_colour(default_shader(), colour);
 }
 
 void ct_pop_colour()
@@ -346,10 +360,10 @@ void ct_pop_colour()
 	colour_stack.size--;
 	if (colour_stack.size == 0)
 	{
-		shader_upload_colour(default_shader, colour_white);
+		shader_upload_colour(default_shader(), colour_white);
 	} else
 	{
-		shader_upload_colour(default_shader, colour_stack.stack+(colour_stack.size*4));
+		shader_upload_colour(default_shader(), colour_stack.stack+(colour_stack.size*4));
 	}
 }
 
@@ -539,7 +553,7 @@ static void texture_bind(CT_Texture* tex)
 	/* Put origin origin at 0,0 */
 	hpmTranslation(-.5, -.5, 0, project_matrix);
 	hpmScale2D(2, ct_is_texture_screen(tex) ? -2 : 2, project_matrix);
-	shader_upload_projection_matrix(default_shader, project_matrix);
+	shader_upload_projection_matrix(default_shader(), project_matrix);
 	glBindFramebuffer(GL_FRAMEBUFFER, tex->gl_buffer_id);
 	CHECK_GL();
 }
@@ -564,9 +578,9 @@ void vertex_data(CT_Transformation* tran, float* data);
 void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation* trans)
 {
 	float data[16]; vertex_data(trans, data);
-	glUseProgram(default_shader->gl_program_id);
+	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader, matrix);
+	shader_upload_modelview_matrix(default_shader(), matrix);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, data);
@@ -666,9 +680,9 @@ void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans)
 void ct_batch_render(CT_Batch* batch, float* matrix)
 {
 	DynVector* vector = batch->vector;
-	glUseProgram(default_shader->gl_program_id);
+	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, batch->atlas->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader, matrix);
+	shader_upload_modelview_matrix(default_shader(), matrix);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, vector->data);

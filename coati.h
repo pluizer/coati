@@ -19,13 +19,6 @@ typedef struct _TTF_Font TTF_Font;
 
 typedef struct
 {
-	unsigned gl_program_id;
-	unsigned gl_vertex_id;
-	unsigned gl_fragment_id;
-} CT_Shader;
-
-typedef struct
-{
 	SDL_Surface* sdl_surface;
 } CT_Image;
 
