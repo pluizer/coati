@@ -1,0 +1,20 @@
+A simple, small and fast 2D game programming library written in C, with the focus on being easy to bind to other languages.
+
+- Version: 0.1
+- Author: Richard van Roy (pluizer)
+- Project: [[https://github.com/pluizer/coati]]
+- License: [[http://opensource.org/licenses/MIT][MIT]]
+
+* Installation
+: make
+: make install
+
+* Dependencies
+- [[http://www.libsdl.org/index.php][SDL 2.0]]
+- [[https://www.libsdl.org/projects/SDL_image/][SDL_image 2.0]]
+- [[https://www.libsdl.org/projects/SDL_ttf/][SDL_ttf 2.0]]
+- [[http://glew.sourceforge.net/][GLEW]]
+
+* Not yet done
+- Examples
+- Sound
