@@ -10,8 +10,7 @@ all:
 
 install: $(TARGET)
 	install $(TARGET) $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include/coati
-	cp coati.h $(PREFIX)/include
+	install coati.h $(PREFIX)/include
 	ldconfig $(PREFIX)/lib
 
 uninstall:
