@@ -4,7 +4,11 @@
 #include <math.h>
 #include <hypermath.h>
 #include <dynvector.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 /* Constants */
 
@@ -289,7 +293,7 @@ unsigned ct_image_bpp(CT_Image* image)
 	return image->sdl_surface->format->BytesPerPixel;
 }
 
-GLuint ct_image_gl_format(CT_Image* image)
+static unsigned ct_image_gl_format(CT_Image* image)
 {
 	switch(ct_image_bpp(image))
 	{

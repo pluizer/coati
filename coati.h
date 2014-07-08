@@ -1,11 +1,6 @@
 #ifndef __core_h__
 #define __core_h__
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <GL/glew.h>
-
 #define CT_MAX_TARGET_STACK_SIZE  32
 #define CT_MAX_BLEND_STACK_SIZE   32
 #define CT_MAX_COLOUR_STACK_SIZE  32
@@ -13,14 +8,20 @@
 
 #define CT_SCREEN ct_screen_texture()
 
+#include <stdio.h>
+
 typedef struct DynVector_t DynVector;
 typedef enum CT_Key_t CT_Key;
+typedef struct SDL_Surface SDL_Surface;
+typedef struct SDL_Window SDL_Window;
+typedef struct SDL_RWops SDL_RWops;
+typedef struct _TTF_Font TTF_Font;
 
 typedef struct
 {
-	GLuint gl_program_id;
-	GLuint gl_vertex_id;
-	GLuint gl_fragment_id;
+	unsigned gl_program_id;
+	unsigned gl_vertex_id;
+	unsigned gl_fragment_id;
 } CT_Shader;
 
 typedef struct
@@ -30,9 +31,9 @@ typedef struct
 
 typedef struct
 {
-	GLsizei w, h;
-	GLuint gl_texture_id;
-	GLuint gl_buffer_id;
+	unsigned w, h;
+	unsigned gl_texture_id;
+	unsigned gl_buffer_id;
 } CT_Texture;
 
 typedef struct
@@ -109,8 +110,6 @@ extern CT_Image* ct_image_create(unsigned w, unsigned h);
 extern void ct_image_free(CT_Image* image);
 
 extern unsigned ct_image_bpp(CT_Image* image);
-
-extern GLuint ct_image_gl_format(CT_Image* image);
 
 extern void ct_image_size(CT_Image* image, float* vect);
 
