@@ -146,7 +146,7 @@ static void shader_upload_projection_matrix(CT_Shader* shader, float* matrix)
 	CHECK_GL();
 }
 
-CT_Shader* ct_shader_create(const char* vertex_source,
+static CT_Shader* ct_shader_create(const char* vertex_source,
 		      const char* fragment_source)
 {
 	int success;
@@ -165,7 +165,7 @@ CT_Shader* ct_shader_create(const char* vertex_source,
 	return shader;
 }
 
-void ct_shader_free(CT_Shader* shader)
+static void ct_shader_free(CT_Shader* shader)
 {
 	free(shader);
 }

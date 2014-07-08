@@ -81,14 +81,6 @@ typedef struct
 #define set_error SDL_SetError
 #define get_error SDL_GetError
 
-/* Shader */
-CT_Shader* default_shader = NULL;\
-
-extern CT_Shader* ct_shader_create(const char* vertex_source,
-				const char* fragment_source);
-
-extern void ct_shader_free(CT_Shader* shader);
-
 /* Window */
 
 extern int ct_window_init();
@@ -182,9 +174,9 @@ extern CT_Font* ct_font_load(const char* filename);
 extern void ct_font_free(CT_Font* font);
 
 extern CT_Texture* ct_texture_from_string(CT_Font* font,
-				    unsigned size,
-				    const char* string,
-				    float* colour);
+					  unsigned size,
+					  const char* string,
+					  float* colour);
 
 /* Input */
 
