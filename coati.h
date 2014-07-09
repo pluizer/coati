@@ -171,7 +171,9 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 
 /* Transformation */
 
-extern CT_Transformation* ct_cast_array_to_transformation(float* array);
+extern CT_Transformation* ct_array_to_transformation(float* array);
+
+extern void ct_transformation_free(CT_Transformation* trans);
 
 /* Camera */
 /* TODO: Remove matrix argument from render function 

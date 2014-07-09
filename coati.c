@@ -814,9 +814,16 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 
 /* Transformation */
 
-CT_Transformation* ct_cast_array_to_transformation(float* array)
+CT_Transformation* ct_array_to_transformation(float* array)
 {
-	return (CT_Transformation*)array;
+	CT_Transformation* trans = malloc(sizeof(CT_Transformation));
+	memcpy(trans, array, sizeof(CT_Transformation));
+	return trans;
+}
+
+void ct_transformation_free(CT_Transformation* trans)
+{
+	free(trans);
 }
 
 static void vertex_data(CT_Transformation* tran, float* data)
