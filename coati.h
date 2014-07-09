@@ -71,8 +71,9 @@ typedef struct
 
 /* Error */
 
-#define set_error SDL_SetError
-#define get_error SDL_GetError
+extern const char* ct_get_error();
+
+extern void ct_set_error(const char* str);
 
 /* Window */
 
@@ -93,8 +94,6 @@ extern CT_Image* ct_image_load(const char* filename);
 extern CT_Image* ct_image_create(unsigned w, unsigned h);
 
 extern void ct_image_free(CT_Image* image);
-
-extern unsigned ct_image_bpp(CT_Image* image);
 
 extern void ct_image_size(CT_Image* image, float* vect);
 
