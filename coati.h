@@ -85,7 +85,7 @@ extern void ct_window_fullscreen_set(int fullscreen);
 
 extern void ct_window_update();
 
-extern void ct_window_clear();
+extern void ct_window_clear(float* colour);
 
 /* Image */
 
