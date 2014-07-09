@@ -123,7 +123,7 @@ extern CT_Texture* ct_image_to_texture(CT_Image* image);
 
 extern CT_Texture* ct_texture_create(unsigned w, unsigned h);
 
-extern CT_Texture* texture_copy(CT_Texture* texture);
+extern CT_Texture* ct_texture_copy(CT_Texture* texture);
 
 extern CT_Texture* ct_texture_load(const char* filename);
 

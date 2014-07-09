@@ -517,7 +517,7 @@ CT_Texture* ct_texture_load(const char* filename)
 	return tex;
 }
 
-CT_Texture* texture_copy(CT_Texture* texture)
+CT_Texture* ct_texture_copy(CT_Texture* texture)
 {
 	CT_Texture* tex = ct_texture_create(texture->w, texture->h);
 	/**/
