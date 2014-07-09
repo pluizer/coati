@@ -265,6 +265,11 @@ void ct_window_fullscreen_set(int fullscreen)
 	window.fullscreen = fullscreen;
 }
 
+int ct_window_fullscreen()
+{
+	return window.fullscreen;
+}
+	
 int window_is_fullscreen()
 {
 	return window.fullscreen;

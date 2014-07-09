@@ -86,6 +86,8 @@ extern void ct_window_resolution(unsigned* ret);
 
 extern void ct_window_fullscreen_set(int fullscreen);
 
+extern int ct_window_fullscreen();
+
 extern void ct_window_update();
 
 extern void ct_window_clear(float* colour);
