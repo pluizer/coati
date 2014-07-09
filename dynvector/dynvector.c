@@ -4,33 +4,40 @@
 #include <assert.h>
 #include "dynvector.h"
 
-IndexStack* new_index_stack(unsigned max_size)
+typedef struct _DV_IndexStack
 {
-	IndexStack* is = malloc(sizeof(IndexStack));
+	unsigned* data;
+	unsigned max_size;
+	unsigned size;
+} DV_IndexStack;
+
+DV_IndexStack* new_index_stack(unsigned max_size)
+{
+	DV_IndexStack* is = malloc(sizeof(DV_IndexStack));
 	is->data = malloc(sizeof(unsigned) * max_size);
 	is->max_size = max_size;
 	is->size = 0;
 	return is;
 }
 
-void free_index_stack(IndexStack* is)
+void free_index_stack(DV_IndexStack* is)
 {
 	free(is->data);
 	free(is);
 }
 
-void index_stack_push(IndexStack* is, unsigned index)
+void index_stack_push(DV_IndexStack* is, unsigned index)
 {
 	assert(is->size < is->max_size);
 	is->data[is->size++] = index;
 }
 
-int index_stack_empty(IndexStack* is)
+int index_stack_empty(DV_IndexStack* is)
 {
 	return !is->size;
 }
 
-unsigned index_stack_pop(IndexStack* is)
+unsigned index_stack_pop(DV_IndexStack* is)
 {
 	assert(!index_stack_empty(is));
 	return is->data[is->size - 1];
