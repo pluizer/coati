@@ -650,7 +650,7 @@ void ct_pop_target()
 CT_Batch* ct_batch_create(CT_Texture* atlas, unsigned size)
 {
 	CT_Batch* batch = smalloc(sizeof(CT_Batch));
-	batch->vector  = new_dynvector(16, size);
+	batch->vector  = dv_vector_new(16, size);
 	batch->indices = smalloc(sizeof(unsigned short)*size*6);
 	unsigned int i=0;
 	for (i=0; i<size; i++) {
@@ -667,7 +667,7 @@ CT_Batch* ct_batch_create(CT_Texture* atlas, unsigned size)
 
 void ct_batch_free(CT_Batch* batch)
 {
-	free_dynvector(batch->vector);
+	dv_vector_free(batch->vector);
 	free(batch->indices);
 	free(batch);
 }
@@ -676,22 +676,22 @@ unsigned ct_batch_push(CT_Batch* batch, CT_Transformation* trans)
 {
 	
 	float data[16]; vertex_data(trans, data);
-	return dynvector_push(batch->vector, data);
+	return dv_vector_push(batch->vector, data);
 }
 
 void ct_batch_remove(CT_Batch* batch, unsigned id)
 {
-	dynvector_remove(batch->vector, id);
+	dv_vector_remove(batch->vector, id);
 }
 
 void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans)
 {
-	vertex_data(trans, dynvector_get(batch->vector, id));
+	vertex_data(trans, dv_vector_ref(batch->vector, id));
 }
 
 void ct_batch_render(CT_Batch* batch, float* matrix)
 {
-	DynVector* vector = batch->vector;
+	DV_Vector* vector = batch->vector;
 	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, batch->atlas->gl_texture_id);
 	shader_upload_modelview_matrix(default_shader(), matrix);

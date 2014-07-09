@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-typedef struct DynVector_t DynVector;
+typedef struct _DV_Vector DV_Vector;
 typedef enum _CT_Key CT_Key;
 typedef struct SDL_Surface SDL_Surface;
 typedef struct SDL_Window SDL_Window;
@@ -39,7 +39,7 @@ typedef struct
 
 typedef struct _CT_Batch
 {
-	DynVector* vector;
+	DV_Vector* vector;
 	unsigned short* indices;
 	CT_Texture* atlas;
 } CT_Batch;

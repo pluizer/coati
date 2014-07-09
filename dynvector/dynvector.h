@@ -8,7 +8,7 @@ typedef struct
 	unsigned size;
 } IndexStack;
 
-typedef struct DynVector_t
+typedef struct _DV_Vector
 {
 	float* data;
 	unsigned* indices;
@@ -17,18 +17,18 @@ typedef struct DynVector_t
 	unsigned size;
 	unsigned max_size;
 	unsigned chunk_size;
-} DynVector;
+} DV_Vector;
 
-extern DynVector* new_dynvector(unsigned chunk_size, unsigned max_size);
+extern DV_Vector* dv_vector_new(unsigned chunk_size, unsigned max_size);
 
-extern void free_dynvector(DynVector* dv);
+extern void dv_vector_free(DV_Vector* dv);
 
-extern unsigned dynvector_push(DynVector* dv, float* chunk);
+extern unsigned dv_vector_push(DV_Vector* dv, float* chunk);
 
-extern void dynvector_remove(DynVector* dv, unsigned index);
+extern void dv_vector_remove(DV_Vector* dv, unsigned index);
 
-extern void dynvector_change(DynVector* dv, unsigned index, float* chunk);
+extern void dv_vector_change(DV_Vector* dv, unsigned index, float* chunk);
 
-extern float* dynvector_get(DynVector* dv, unsigned index);
+extern float* dv_vector_ref(DV_Vector* dv, unsigned index);
 
 #endif /* __dynvector_h_ */

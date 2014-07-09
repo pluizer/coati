@@ -36,9 +36,9 @@ unsigned index_stack_pop(IndexStack* is)
 	return is->data[is->size - 1];
 }
 
-DynVector* new_dynvector(unsigned chunk_size, unsigned max_size)
+DV_Vector* dv_vector_new(unsigned chunk_size, unsigned max_size)
 {
-	DynVector* dv = malloc(sizeof(DynVector));
+	DV_Vector* dv = malloc(sizeof(DV_Vector));
 	assert(dv);
 	dv->indices = malloc(sizeof(unsigned)*max_size);
 	memset(dv->indices, 0, sizeof(unsigned)*max_size);
@@ -52,7 +52,7 @@ DynVector* new_dynvector(unsigned chunk_size, unsigned max_size)
 	return dv;
 }
 
-void free_dynvector(DynVector* dv)
+void dv_vector_free(DV_Vector* dv)
 {
 	free(dv->data);
 	free(dv->indices);
@@ -62,7 +62,7 @@ void free_dynvector(DynVector* dv)
 }
 
 
-unsigned dynvector_push(DynVector* dv, float* chunk)
+unsigned dv_vector_push(DV_Vector* dv, float* chunk)
 {
 	unsigned index = index_stack_empty(dv->available_stack) 
 		? dv->size : index_stack_pop(dv->available_stack);
@@ -74,7 +74,7 @@ unsigned dynvector_push(DynVector* dv, float* chunk)
 	return index;
 }
 
-void dynvector_remove(DynVector* dv, unsigned index)
+void dv_vector_remove(DV_Vector* dv, unsigned index)
 {
 	dv->size--;
 	if (dv->indices[index] != dv->size)
@@ -87,14 +87,14 @@ void dynvector_remove(DynVector* dv, unsigned index)
 	index_stack_push(dv->available_stack, index);
 }
 
-void dynvector_change(DynVector* dv, unsigned index, float* chunk)
+void dv_vector_change(DV_Vector* dv, unsigned index, float* chunk)
 {
 	memcpy(dv->data+(dv->chunk_size * dv->indices[index]),
 	       chunk,
 	       dv->chunk_size * sizeof(float));
 }
 
-float* dynvector_get(DynVector* dv, unsigned index)
+float* dynvector_ref(DV_Vector* dv, unsigned index)
 {
 	return dv->data+(dv->chunk_size * dv->indices[index]);
 }
