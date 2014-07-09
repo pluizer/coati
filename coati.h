@@ -5,6 +5,7 @@
 #define CT_MAX_BLEND_STACK_SIZE   32
 #define CT_MAX_COLOUR_STACK_SIZE  32
 #define CT_MAX_INPUT_STACK_SIZE   8
+#define CT_MAX_CAMERA_STACK_SIZE  32
 
 #include <stdio.h>
 
@@ -135,7 +136,7 @@ extern void ct_texture_size(CT_Texture* texture, float* vect);
 
 extern void ct_texture_clear(CT_Texture* tex, float* colour);
 
-extern void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation* trans);
+extern void ct_texture_render(CT_Texture* tex, CT_Transformation* trans);
 
 /* Target */
 
@@ -155,7 +156,7 @@ extern void ct_batch_remove(CT_Batch* batch, unsigned id);
 
 extern void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans);
 
-extern void ct_batch_render(CT_Batch* batch, float* matrix);
+extern void ct_batch_render(CT_Batch* batch);
 
 /* Font */
 
@@ -176,8 +177,22 @@ extern CT_Transformation* ct_array_to_transformation(float* array);
 extern void ct_transformation_free(CT_Transformation* trans);
 
 /* Camera */
-/* TODO: Remove matrix argument from render function 
-   in favour of a matrix stack */
+
+extern void ct_camera_push();
+
+extern void ct_camera_pop();
+
+extern void ct_camera_position_set(float* value);
+
+extern void ct_camera_position(float* ret);
+
+extern void ct_camera_scale_set(float value);
+
+extern float ct_camera_scale();
+
+extern void ct_camera_rotation_set(float value);
+
+extern float ct_camera_rotation();
 
 /* Input */
 

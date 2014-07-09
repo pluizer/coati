@@ -362,6 +362,23 @@ void hpmTranslateRotateScale2D(float x, float y, float z, float angle, float sca
     m->_34 = z;
 }
 
+void hpmTranslateRotateScalePivot2D(float x, float y, float z, float angle, float scale,
+				    float px, float py, float *mat){
+    HPMmat4 *m = (HPMmat4 *) mat;
+    initMat4(m);
+    float c = scale * cos(angle);
+    float s = scale * sin(angle);
+    m->_11 = c;
+    m->_22 = c;
+    m->_12 = -s;
+    m->_21 = s;
+    m->_33 = 1.0;
+    m->_44 = 1.0;
+    m->_14 = x;
+    m->_24 = y;
+    m->_34 = z;
+}
+
 void hpmTranspose(const float *mat, float *result){
     HPMmat4 *m = (HPMmat4 *) mat;
     HPMmat4 *r = (HPMmat4 *) result;

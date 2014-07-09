@@ -534,7 +534,7 @@ CT_Texture* ct_texture_copy(CT_Texture* texture)
 	float idem[16]; hpmIdentityMat4(idem);
 	ct_blend_mode_push(CT_BLEND_MODE_NORMAL);
 	ct_target_push(tex);
-	ct_texture_render(texture, idem, &trans);
+	//ct_texture_render(texture, idem, &trans);
 	ct_target_pop();
 	ct_blend_mode_pop();
 	return tex;
@@ -592,12 +592,14 @@ static GLushort rect_index_order[] = { 0, 1, 2, 0, 2, 3 };
 
 static void vertex_data(CT_Transformation* tran, float* data);
 
-void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation* trans)
+static float* camera_matrix();
+
+void ct_texture_render(CT_Texture* tex, CT_Transformation* trans)
 {
 	float data[16]; vertex_data(trans, data);
 	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), matrix);
+	shader_upload_modelview_matrix(default_shader(), camera_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, data);
@@ -694,12 +696,12 @@ void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans)
 	vertex_data(trans, dv_vector_ref(batch->vector, id));
 }
 
-void ct_batch_render(CT_Batch* batch, float* matrix)
+void ct_batch_render(CT_Batch* batch)
 {
 	DV_Vector* vector = batch->vector;
 	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, batch->atlas->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), matrix);
+	shader_upload_modelview_matrix(default_shader(), camera_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, vector->data);
@@ -873,6 +875,72 @@ static void vertex_data(CT_Transformation* tran, float* data)
 		memcpy(data, new_data, sizeof(float)*16);
 	}
 }
+
+/* Camera */
+
+static struct
+{
+	float position[2];
+	float scale, rotation;
+	float matrix[16]; /* private: use camera_matrix() */
+	int dirty;
+} camera = {
+	{0, 0}, 1, 0,
+	{ 1, 0, 0, 0,
+	  0, 1, 0, 0,
+	  0, 0, 1, 0,
+	  0, 0, 0, 1 }, 1 };
+
+static void adjust_camera_matrix()
+{
+	hpmIdentityMat4(camera.matrix);
+	hpmTranslate(camera.position[0]-.5, camera.position[1]-.5, 0, camera.matrix);
+	hpmRotateZ(camera.rotation, camera.matrix);
+	hpmScale2D(camera.scale, camera.scale, camera.matrix);
+	hpmTranslate(.5,
+		     .5,
+		     0, camera.matrix);
+}
+
+static float* camera_matrix()
+{
+	if (camera.dirty) adjust_camera_matrix();
+	return camera.matrix;
+}
+
+void ct_camera_position_set(float* value)
+{
+	camera.dirty = 1;
+	memcpy(camera.position, value, sizeof(float)*2);
+}
+
+void ct_camera_position(float* ret)
+{
+	memcpy(ret, camera.position, sizeof(float)*2);
+}
+
+void ct_camera_scale_set(float value)
+{
+	camera.dirty = 1;
+	camera.scale = value;
+}
+
+float ct_camera_scale()
+{
+	return camera.scale;
+}
+
+void ct_camera_rotation_set(float value)
+{
+	camera.dirty = 1;
+	camera.rotation = value;
+}
+
+float ct_camera_rotation()
+{
+	return camera.rotation;
+}
+
 
 /* Input */
 
