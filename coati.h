@@ -119,7 +119,7 @@ extern void ct_pop_blend_mode();
 
 /* Texture */
 
-extern CT_Texture* ct_texture_from_image(CT_Image* image);
+extern CT_Texture* ct_image_to_texture(CT_Image* image);
 
 extern CT_Texture* ct_texture_create(unsigned w, unsigned h);
 
@@ -165,10 +165,10 @@ extern CT_Font* ct_font_load(const char* filename);
 
 extern void ct_font_free(CT_Font* font);
 
-extern CT_Texture* ct_texture_from_string(CT_Font* font,
-					  unsigned size,
-					  const char* string,
-					  float* colour);
+extern CT_Texture* ct_string_to_texture(CT_Font* font,
+					unsigned size,
+					const char* string,
+					float* colour);
 
 /* Input */
 

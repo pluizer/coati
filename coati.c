@@ -494,7 +494,7 @@ static CT_Texture* texture_init(CT_Image* image, unsigned format)
 	return tex;
 }
 
-CT_Texture* ct_texture_from_image(CT_Image* image)
+CT_Texture* ct_image_to_texture(CT_Image* image)
 {
 	return texture_init(image, ct_image_gl_format(image));
 }
@@ -502,7 +502,7 @@ CT_Texture* ct_texture_from_image(CT_Image* image)
 CT_Texture* ct_texture_create(unsigned w, unsigned h)
 {
 	CT_Image* image = ct_image_create(w, h);
-	CT_Texture* tex = ct_texture_from_image(image);
+	CT_Texture* tex = ct_image_to_texture(image);
 	if (!image) return NULL; /* ct_image_create already prints error message. */
 	ct_image_free(image);
 	return tex;
@@ -512,7 +512,7 @@ CT_Texture* ct_texture_load(const char* filename)
 {
 	CT_Image* image = ct_image_load(filename);
 	if (!image) return NULL; /* ct_image_load already prints error message. */
-	CT_Texture* tex = ct_texture_from_image(image);
+	CT_Texture* tex = ct_image_to_texture(image);
 	ct_image_free(image);
 	return tex;
 }
@@ -787,10 +787,10 @@ static TTF_Font* get_ttf_font(CT_Font* font, unsigned size)
 	return ttf_font ? ttf_font : load_font_size(font, size);
 }
 
-extern CT_Texture* ct_texture_from_string(CT_Font* font,
-				    unsigned size,
-				    const char* string,
-				    float* colour)
+extern CT_Texture* ct_string_to_texture(CT_Font* font,
+					unsigned size,
+					const char* string,
+					float* colour)
 {
 	TTF_Font* ttf_font = get_ttf_font(font, size);
 	if (!ttf_font) return NULL; /* Error already reported. */
@@ -802,7 +802,7 @@ extern CT_Texture* ct_texture_from_string(CT_Font* font,
 	TTF_SizeText(ttf_font, string, &w, &h);
 	SDL_Surface* sur = TTF_RenderText_Blended(ttf_font, string, sdl_colour);
 	CT_Image* image = image_alloc(sur);
-	CT_Texture* tex = ct_texture_from_image(image);
+	CT_Texture* tex = ct_image_to_texture(image);
 	ct_image_free(image);
 	return tex;
 }
