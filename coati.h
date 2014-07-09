@@ -85,6 +85,8 @@ extern void ct_window_fullscreen_set(int fullscreen);
 
 extern void ct_window_update();
 
+extern void ct_window_clear();
+
 /* Image */
 
 extern CT_Image* ct_image_load(const char* filename);
@@ -161,6 +163,7 @@ extern CT_Font* ct_font_load(const char* filename);
 
 extern void ct_font_free(CT_Font* font);
 
+/* TODO: Use colour stack? */
 extern CT_Texture* ct_string_to_texture(CT_Font* font,
 					unsigned size,
 					const char* string,

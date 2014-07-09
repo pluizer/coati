@@ -275,6 +275,11 @@ void ct_window_update()
 	SDL_GL_SwapWindow(window.sdl_window);
 }
 
+void ct_window_clear(float* colour)
+{
+	ct_texture_clear(ct_screen_texture(), colour);
+}
+
 /* Image */
 
 static CT_Image* image_alloc(SDL_Surface* sur)
