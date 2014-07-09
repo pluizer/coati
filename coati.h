@@ -80,7 +80,9 @@ extern int ct_window_init();
 
 extern void ct_window_quit();
 
-extern void ct_window_res_set(int x, int y);
+extern void ct_window_resolution_set(unsigned* xy);
+
+extern void ct_window_resolution(unsigned* ret);
 
 extern void ct_window_fullscreen_set(int fullscreen);
 

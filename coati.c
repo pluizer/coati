@@ -243,10 +243,20 @@ void ct_window_quit()
 	SDL_Quit();
 }
 
-void ct_window_res_set(int x, int y)
+void ct_window_resolution_set(unsigned* xy)
 {
 	window.is_size_changed = 1;
-	SDL_SetWindowSize(window.sdl_window, x, y);
+	SDL_SetWindowSize(window.sdl_window, ((int*)xy)[0], ((int*)xy)[1]);
+}
+
+void ct_window_resolution(unsigned* ret)
+{
+	int x, y;
+	SDL_GetWindowSize(window.sdl_window, (int*)ret, (int*)ret+1);
+}
+
+void ct_window_res_set(int x, int y)
+{
 }
 
 void ct_window_fullscreen_set(int fullscreen)
