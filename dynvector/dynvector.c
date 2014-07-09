@@ -101,7 +101,7 @@ void dv_vector_change(DV_Vector* dv, unsigned index, float* chunk)
 	       dv->chunk_size * sizeof(float));
 }
 
-float* dynvector_ref(DV_Vector* dv, unsigned index)
+float* dv_vector_ref(DV_Vector* dv, unsigned index)
 {
 	return dv->data+(dv->chunk_size * dv->indices[index]);
 }
