@@ -343,7 +343,7 @@ static struct
 	unsigned size;
 } colour_stack;
 
-void ct_push_colour(float* colour)
+void ct_colour_push(float* colour)
 {
 	if (colour_stack.size >= CT_MAX_COLOUR_STACK_SIZE)
 	{
@@ -359,7 +359,7 @@ void ct_push_colour(float* colour)
 	shader_upload_colour(default_shader(), colour);
 }
 
-void ct_pop_colour()
+void ct_colour_pop()
 {
 	if (colour_stack.size == 0)
 	{
@@ -410,7 +410,7 @@ static void set_blend_mode(CT_BlendMode mode)
 	}
 }
 
-void ct_push_blend_mode(CT_BlendMode mode)
+void ct_blend_mode_push(CT_BlendMode mode)
 {
 	if (blend_stack.size >= CT_MAX_BLEND_STACK_SIZE)
 	{
@@ -424,7 +424,7 @@ void ct_push_blend_mode(CT_BlendMode mode)
 	set_blend_mode(mode);
 }
 
-void ct_pop_blend_mode()
+void ct_blend_mode_pop()
 {
 	if (blend_stack.size == 0)
 	{
@@ -527,11 +527,11 @@ CT_Texture* ct_texture_copy(CT_Texture* texture)
 		{ 0, 0 }, 0,
 		-1, -1 };
 	float idem[16]; hpmIdentityMat4(idem);
-	ct_push_blend_mode(CT_BLEND_MODE_NORMAL);
-	ct_push_target(tex);
+	ct_blend_mode_push(CT_BLEND_MODE_NORMAL);
+	ct_target_push(tex);
 	ct_texture_render(texture, idem, &trans);
-	ct_pop_target();
-	ct_pop_blend_mode();
+	ct_target_pop();
+	ct_blend_mode_pop();
 	return tex;
 }
 
@@ -571,15 +571,15 @@ static void texture_bind(CT_Texture* tex)
 }
 
 
-void ct_push_target(CT_Texture* tex);
+void ct_target_push(CT_Texture* tex);
 
-void ct_pop_target();
+void ct_target_pop();
 
 void ct_texture_clear(CT_Texture* tex, float* colour)
 {
-	ct_push_target(tex);
+	ct_target_push(tex);
 	glClearBufferfv(GL_COLOR, 0, colour);
-	ct_pop_target();
+	ct_target_pop();
 	CHECK_GL();
 }
 
@@ -616,7 +616,7 @@ static CT_Texture* current_target()
 		: ct_screen_texture();
 }
 
-void ct_push_target(CT_Texture* tex)
+void ct_target_push(CT_Texture* tex)
 {
 	if (target_stack.size >= CT_MAX_TARGET_STACK_SIZE)
 	{
@@ -629,7 +629,7 @@ void ct_push_target(CT_Texture* tex)
 	target_stack.stack[target_stack.size++] = tex;
 }
 
-void ct_pop_target()
+void ct_target_pop()
 {
 	if (target_stack.size == 0)
 	{
@@ -884,7 +884,7 @@ static int has_key(CT_Key key, InputStack* stack)
 	return 0;
 }
 
-static void push_key(CT_Key key, InputStack* stack)
+static void key_push(CT_Key key, InputStack* stack)
 {
 	if (key && !has_key(key, stack))
 	{
@@ -893,7 +893,7 @@ static void push_key(CT_Key key, InputStack* stack)
 	}
 }
 
-static void pop_key(CT_Key key, InputStack* stack)
+static void key_pop(CT_Key key, InputStack* stack)
 {
 	unsigned i;
 	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
@@ -908,7 +908,7 @@ static void pop_key(CT_Key key, InputStack* stack)
 
 static void key_down_callback(Uint8 key)
 {
-	push_key(key, &pressed_stack);
+	key_push(key, &pressed_stack);
 }
 
 static void key_up_callback(Uint8 key)
@@ -918,8 +918,8 @@ static void key_up_callback(Uint8 key)
 	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
 	{
 	}
-	pop_key (key, &holded_stack);
-	push_key(key, &released_stack);
+	key_pop(key, &holded_stack);
+	key_push(key, &released_stack);
 }
 
 static void reset_stacks()
@@ -927,7 +927,7 @@ static void reset_stacks()
 	unsigned i;
 	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
 	{
-		push_key(pressed_stack.stack[i], &holded_stack);
+		key_push(pressed_stack.stack[i], &holded_stack);
 		pressed_stack.stack [i] = 0;
 		released_stack.stack[i] = 0;
 	}

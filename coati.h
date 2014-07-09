@@ -97,9 +97,9 @@ extern void ct_image_size(CT_Image* image, float* vect);
 
 /* Colour */
 
-extern void ct_push_colour(float* colour);
+extern void ct_colour_push(float* colour);
 
-extern void ct_pop_colour();
+extern void ct_colour_pop();
 
 /* Blending */
 
@@ -111,9 +111,9 @@ typedef enum _CT_BlendMode
 	CT_BLEND_MODE_ONE_ONE
 } CT_BlendMode;
 
-extern void ct_push_blend_mode(CT_BlendMode mode);
+extern void ct_blend_mode_push(CT_BlendMode mode);
 
-extern void ct_pop_blend_mode();
+extern void ct_blend_mode_pop();
 
 /* Texture */
 
@@ -137,9 +137,9 @@ extern void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation*
 
 /* Target */
 
-extern void ct_push_target(CT_Texture* tex);
+extern void ct_target_push(CT_Texture* tex);
 
-extern void ct_pop_target();
+extern void ct_target_pop();
 
 /* Batch */
 
