@@ -166,6 +166,10 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 					const char* string,
 					float* colour);
 
+/* Transformation */
+
+extern CT_Transformation* ct_cast_array_to_transformation(float* array);
+
 /* Input */
 
 extern int ct_is_quitting();

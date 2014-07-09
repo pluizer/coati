@@ -585,7 +585,7 @@ void ct_texture_clear(CT_Texture* tex, float* colour)
 
 static GLushort rect_index_order[] = { 0, 1, 2, 0, 2, 3 };
 
-void vertex_data(CT_Transformation* tran, float* data);
+static void vertex_data(CT_Transformation* tran, float* data);
 
 void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation* trans)
 {
@@ -805,6 +805,61 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 	CT_Texture* tex = ct_image_to_texture(image);
 	ct_image_free(image);
 	return tex;
+}
+
+/* Transformation */
+
+CT_Transformation* ct_cast_array_to_transformation(float* array)
+{
+	return (CT_Transformation*)array;
+}
+
+static void vertex_data(CT_Transformation* tran, float* data)
+{
+	float l1 = tran->dst_rect[0];
+	float r1 = tran->dst_rect[1];
+	float t1 = tran->dst_rect[2];
+	float b1 = tran->dst_rect[3];
+	/**/
+	float l2 = tran->src_rect[0];
+	float r2 = tran->src_rect[1];
+	float t2 = tran->src_rect[2];
+	float b2 = tran->src_rect[3];
+	/**/
+	float px = tran->origin[0];
+	float py = tran->origin[1];
+	/**/
+	if (tran->flip_h > 0) swap_float(&r2, &l2);
+	if (tran->flip_v > 0) swap_float(&b2, &t2);
+	/**/
+	if (zeroish(tran->rotation))
+	{
+		float new_data[] = {
+			l1-px, t1-py, l2, t2,
+			r1-px, t1-py, r2, t2,
+			r1-px, b1-py, r2, b2,
+			l1-px, b1-py, l2, b2 };
+		memcpy(data, new_data, sizeof(float)*16);
+	} else
+	{
+		float ca = cos(tran->rotation);
+		float sa = sin(tran->rotation);
+		/**/
+		float x1 = ((l1 - px) * ca) - ((t1 - py) * sa);
+		float y1 = ((l1 - px) * sa) + ((t1 - py) * ca);
+		float x2 = ((r1 - px) * ca) - ((t1 - py) * sa);
+		float y2 = ((r1 - px) * sa) + ((t1 - py) * ca);
+		float x3 = ((r1 - px) * ca) - ((b1 - py) * sa);
+		float y3 = ((r1 - px) * sa) + ((b1 - py) * ca);
+		float x4 = ((l1 - px) * ca) - ((b1 - py) * sa);
+		float y4 = ((l1 - px) * sa) + ((b1 - py) * ca);
+		float new_data[] = {
+			x1+px, y1+py, l2, t2,
+			x2+px, y2+py, r2, t2,
+			x3+px, y3+py, r2, b2,
+			x4+px, y4+py, l2, b2 };
+		memcpy(data, new_data, sizeof(float)*16);
+	}
 }
 
 /* Input */
@@ -1262,54 +1317,4 @@ static const char* key_names[] = {
 const char* ct_key_name(CT_Key key)
 {
 	return key_names[key];
-}
-
-/* Transformation */
-
-void vertex_data(CT_Transformation* tran, float* data)
-{
-	float l1 = tran->dst_rect[0];
-	float r1 = tran->dst_rect[1];
-	float t1 = tran->dst_rect[2];
-	float b1 = tran->dst_rect[3];
-	/**/
-	float l2 = tran->src_rect[0];
-	float r2 = tran->src_rect[1];
-	float t2 = tran->src_rect[2];
-	float b2 = tran->src_rect[3];
-	/**/
-	float px = tran->origin[0];
-	float py = tran->origin[1];
-	/**/
-	if (tran->flip_h > 0) swap_float(&r2, &l2);
-	if (tran->flip_v > 0) swap_float(&b2, &t2);
-	/**/
-	if (zeroish(tran->rotation))
-	{
-		float new_data[] = {
-			l1-px, t1-py, l2, t2,
-			r1-px, t1-py, r2, t2,
-			r1-px, b1-py, r2, b2,
-			l1-px, b1-py, l2, b2 };
-		memcpy(data, new_data, sizeof(float)*16);
-	} else
-	{
-		float ca = cos(tran->rotation);
-		float sa = sin(tran->rotation);
-		/**/
-		float x1 = ((l1 - px) * ca) - ((t1 - py) * sa);
-		float y1 = ((l1 - px) * sa) + ((t1 - py) * ca);
-		float x2 = ((r1 - px) * ca) - ((t1 - py) * sa);
-		float y2 = ((r1 - px) * sa) + ((t1 - py) * ca);
-		float x3 = ((r1 - px) * ca) - ((b1 - py) * sa);
-		float y3 = ((r1 - px) * sa) + ((b1 - py) * ca);
-		float x4 = ((l1 - px) * ca) - ((b1 - py) * sa);
-		float y4 = ((l1 - px) * sa) + ((b1 - py) * ca);
-		float new_data[] = {
-			x1+px, y1+py, l2, t2,
-			x2+px, y2+py, r2, t2,
-			x3+px, y3+py, r2, b2,
-			x4+px, y4+py, l2, b2 };
-		memcpy(data, new_data, sizeof(float)*16);
-	}
 }
