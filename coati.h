@@ -170,6 +170,10 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 
 extern CT_Transformation* ct_cast_array_to_transformation(float* array);
 
+/* Camera */
+/* TODO: Remove matrix argument from render function 
+   in favour of a matrix stack */
+
 /* Input */
 
 extern int ct_is_quitting();
