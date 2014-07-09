@@ -613,7 +613,7 @@ static CT_Texture* current_target()
 {
 	return target_stack.size
 		? target_stack.stack[target_stack.size-1]
-		: CT_SCREEN;
+		: ct_screen_texture();
 }
 
 void ct_push_target(CT_Texture* tex)
@@ -642,7 +642,7 @@ void ct_pop_target()
 	target_stack.size--;
 	texture_bind(target_stack.size
 		     ? target_stack.stack[target_stack.size-1]
-		     : CT_SCREEN);
+		     : ct_screen_texture());
 }
 
 /* Batch */

@@ -6,8 +6,6 @@
 #define CT_MAX_COLOUR_STACK_SIZE  32
 #define CT_MAX_INPUT_STACK_SIZE   8
 
-#define CT_SCREEN ct_screen_texture()
-
 #include <stdio.h>
 
 typedef struct _DV_Vector DV_Vector;
@@ -136,8 +134,6 @@ extern void ct_texture_size(CT_Texture* texture, float* vect);
 extern void ct_texture_clear(CT_Texture* tex, float* colour);
 
 extern void ct_texture_render(CT_Texture* tex, float* matrix, CT_Transformation* trans);
-
-extern CT_Texture* ct_screen_texture();
 
 /* Target */
 
