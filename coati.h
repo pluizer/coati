@@ -11,18 +11,18 @@
 #include <stdio.h>
 
 typedef struct DynVector_t DynVector;
-typedef enum CT_Key_t CT_Key;
+typedef enum _CT_Key CT_Key;
 typedef struct SDL_Surface SDL_Surface;
 typedef struct SDL_Window SDL_Window;
 typedef struct SDL_RWops SDL_RWops;
 typedef struct _TTF_Font TTF_Font;
 
-typedef struct
+typedef struct _CT_Image
 {
 	SDL_Surface* sdl_surface;
 } CT_Image;
 
-typedef struct
+typedef struct _CT_Texture
 {
 	unsigned w, h;
 	unsigned gl_texture_id;
@@ -37,14 +37,14 @@ typedef struct
 	int is_size_changed;
 } CT_Window;
 
-typedef struct
+typedef struct _CT_Batch
 {
 	DynVector* vector;
 	unsigned short* indices;
 	CT_Texture* atlas;
 } CT_Batch;
 
-typedef struct
+typedef struct _CT_Transformation
 {
 	float src_rect[4];
 	float dst_rect[4];
@@ -53,7 +53,7 @@ typedef struct
 	float flip_h, flip_v; /* positive = true, negative = false */
 } CT_Transformation;
 
-typedef struct
+typedef struct _CT_Font
 {
 	FILE* file;
 	SDL_RWops* rw;
@@ -105,7 +105,7 @@ extern void ct_pop_colour();
 
 /* Blending */
 
-typedef enum
+typedef enum _CT_BlendMode
 {
 	CT_BLEND_MODE_NORMAL,
 	CT_BLEND_MODE_ADD,
@@ -186,7 +186,7 @@ extern void ct_poll_input();
 
 extern const char* ct_key_name(CT_Key key);
 
-typedef enum CT_Key_t
+typedef enum _CT_Key
 {
 	CT_KEY_BACKSPACE = 8,
 	CT_KEY_TAB = 9,
