@@ -191,6 +191,11 @@ extern int ct_key_holded(CT_Key key);
 
 extern void ct_mouse_position(float* ret);
 
+/** Returns the number of keys held down and fills ret
+    with all held down keys. ret must be of length
+    CT_MAX_INPUT_STACK_SIZE */
+extern unsigned ct_holded_keys(CT_Key* ret);
+
 extern void ct_poll_input();
 
 extern const char* ct_key_name(CT_Key key);

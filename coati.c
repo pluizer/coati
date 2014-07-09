@@ -926,10 +926,6 @@ static void key_down_callback(Uint8 key)
 static void key_up_callback(Uint8 key)
 {
 
-	unsigned i;
-	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
-	{
-	}
 	key_pop(key, &holded_stack);
 	key_push(key, &released_stack);
 }
@@ -939,7 +935,14 @@ static void reset_stacks()
 	unsigned i;
 	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
 	{
-		key_push(pressed_stack.stack[i], &holded_stack);
+		CT_Key key = pressed_stack.stack[i];
+		/* Up-event for mouse button-x1 and button-x2 don't seem to
+		   work all that well in SDL. To prevent them getting stuck
+		   we won't add them to the holded buffer. */
+		if (key != CT_BUTTON_X1 && key != CT_BUTTON_X2)
+		{
+			key_push(key, &holded_stack);
+		}
 		pressed_stack.stack [i] = 0;
 		released_stack.stack[i] = 0;
 	}
@@ -971,6 +974,21 @@ void ct_mouse_position(float* ret)
 	SDL_GetMouseState(&x, &y);
 	ret[0] = x;
 	ret[1] = y;
+}
+
+unsigned ct_holded_keys(CT_Key* ret)
+{
+	unsigned i, count = 0;
+	for (i=0; i<CT_MAX_INPUT_STACK_SIZE; i++)
+	{
+		CT_Key key = holded_stack.stack[i];
+		if (key)
+		{
+			ret[count] = key;
+			count++;
+		} else ret[i] = 0;
+	}
+	return count;
 }
 
 void ct_poll_input()
