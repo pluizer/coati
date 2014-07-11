@@ -893,69 +893,71 @@ static void vertex_data(CT_Transformation* tran, float* data)
 
 /* Camera */
 
+typedef struct _CT_Camera
+{
+	float matrix[16];
+} CT_Camera;
+
 static struct
 {
-	float position[2];
-	float scale, rotation;
-	float matrix[16]; /* private: use camera_matrix() */
-	int dirty;
-} camera = {
-	{0, 0}, 1, 0,
-	{ 1, 0, 0, 0,
-	  0, 1, 0, 0,
-	  0, 0, 1, 0,
-	  0, 0, 0, 1 }, 1 };
+	CT_Camera default_cam;
+	CT_Camera stack[CT_MAX_COLOUR_STACK_SIZE];
+	unsigned size;
+} camera_stack = {
+	.default_cam =
+	{{ 1, 0, 0, 0,
+	    0, 1, 0, 0,
+	    0, 0, 1, 0,
+	    0, 0, 0, 1 }}};
 
-static void adjust_camera_matrix()
+static CT_Camera* current_camera()
 {
-	hpmIdentityMat4(camera.matrix);
-	hpmTranslate(camera.position[0]-.5, camera.position[1]-.5, 0, camera.matrix);
-	hpmRotateZ(camera.rotation, camera.matrix);
-	hpmScale2D(camera.scale, camera.scale, camera.matrix);
-	hpmTranslate(.5,
-		     .5,
-		     0, camera.matrix);
+	return camera_stack.size
+		? &camera_stack.stack[camera_stack.size-1]
+		: &camera_stack.default_cam;
+
 }
 
 static float* camera_matrix()
 {
-	if (camera.dirty) adjust_camera_matrix();
-	return camera.matrix;
+	return current_camera()->matrix;
 }
 
-void ct_camera_position_set(float* value)
+static void adjust_camera_matrix(CT_Camera* cam,
+				 float* position, float scale, float rotation)
 {
-	camera.dirty = 1;
-	memcpy(camera.position, value, sizeof(float)*2);
+	hpmIdentityMat4(cam->matrix);
+	hpmTranslate(position[0]-.5, position[1]-.5, 0, cam->matrix);
+	hpmRotateZ(rotation, cam->matrix);
+	hpmScale2D(scale, scale, cam->matrix);
+	hpmTranslate(.5, .5, 0, cam->matrix);
 }
 
-void ct_camera_position(float* ret)
+void ct_camera_push(float* position, float scale, float rotation)
 {
-	memcpy(ret, camera.position, sizeof(float)*2);
+	if (camera_stack.size >= CT_MAX_CAMERA_STACK_SIZE)
+	{
+		/* Stack overflow, resetting stack to prevent
+		   crashing if this error is ignored. */
+		ct_set_error("Stack overflow");
+		camera_stack.size = 0;
+	}
+	adjust_camera_matrix(&camera_stack.stack[camera_stack.size++],
+			     position, scale, rotation);
 }
 
-void ct_camera_scale_set(float value)
+void ct_camera_pop()
 {
-	camera.dirty = 1;
-	camera.scale = value;
+	if (camera_stack.size == 0)
+	{
+		/* Stack underflow, setting stack to one
+		   so it will set to default value if this
+		   error is ignored. */
+		ct_set_error("Stack underflow");
+		camera_stack.size = 1;
+	}
+	camera_stack.size--;
 }
-
-float ct_camera_scale()
-{
-	return camera.scale;
-}
-
-void ct_camera_rotation_set(float value)
-{
-	camera.dirty = 1;
-	camera.rotation = value;
-}
-
-float ct_camera_rotation()
-{
-	return camera.rotation;
-}
-
 
 /* Input */
 

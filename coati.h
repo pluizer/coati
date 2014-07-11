@@ -182,21 +182,9 @@ extern void ct_transformation_free(CT_Transformation* trans);
 
 /* Camera */
 
-extern void ct_camera_push();
+extern void ct_camera_push(float* position, float scale, float rotation);
 
 extern void ct_camera_pop();
-
-extern void ct_camera_position_set(float* value);
-
-extern void ct_camera_position(float* ret);
-
-extern void ct_camera_scale_set(float value);
-
-extern float ct_camera_scale();
-
-extern void ct_camera_rotation_set(float value);
-
-extern float ct_camera_rotation();
 
 /* Input */
 
