@@ -1,6 +1,6 @@
 SOURCES = dynvector/dynvector.o hypermath/hypermath.o audio.o core.o input.o
 INCLUDE = -I./hypermath -I./dynvector -I./include
-LIBS    = `pkg-config --libs --cflags SDL2_ttf sdl2 SDL2_image glew` -lm
+LIBS    = `pkg-config --libs --cflags SDL2_ttf sdl2 SDL2_image SDL2_mixer glew` -lm
 CFLAGS  = -g3 -DDEBUG -Wall -pedantic -std=c11 -fPIC
 TARGET  = build/libcoati.so
 PREFIX  = /usr/local
