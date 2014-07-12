@@ -1,13 +1,13 @@
 SOURCES = dynvector/dynvector.c hypermath/hypermath.c coati.c
 INCLUDE = -I./hypermath -I./dynvector
 LIBS    = `pkg-config --libs --cflags SDL2_ttf sdl2 SDL2_image glew` -lm
-CFLAGS  = -g3 -DDEBUG -Wall -pedantic
+CFLAGS  = -g3 -DDEBUG -Wall -pedantic -std=c11
 TARGET  = build/libcoati.so
 PREFIX  = /usr/local
 
 all:
 	mkdir -p build
-	$(CC) -shared -fPIC $(SOURCES) $(INCLUDE) $(LIBS) -o $(TARGET)
+	$(CC) -shared -fPIC $(CFLAGS) $(SOURCES) $(INCLUDE) $(LIBS) -o $(TARGET)
 
 install: $(TARGET)
 	install $(TARGET) $(PREFIX)/lib

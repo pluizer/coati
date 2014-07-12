@@ -251,7 +251,6 @@ void ct_window_resolution_set(unsigned* xy)
 
 void ct_window_resolution(unsigned* ret)
 {
-	int x, y;
 	SDL_GetWindowSize(window.sdl_window, (int*)ret, (int*)ret+1);
 }
 
@@ -279,8 +278,8 @@ CT_Texture* ct_screen_texture()
 {
 	if (window.is_size_changed) {
 		SDL_GetWindowSize(window.sdl_window,
-				  &_ct_screen_texture.w,
-				  &_ct_screen_texture.h);
+				  (int*)&_ct_screen_texture.w,
+				  (int*)&_ct_screen_texture.h);
 	}
 	return &_ct_screen_texture;
 }
@@ -539,6 +538,7 @@ CT_Texture* ct_texture_load(const char* filename)
 
 CT_Texture* ct_texture_copy(CT_Texture* texture)
 {
+	/* TODO */
 	CT_Texture* tex = ct_texture_create(texture->w, texture->h);
 	/**/
 	CT_Transformation trans = {
@@ -669,7 +669,7 @@ void ct_target_pop()
 
 /* Batch */
 
-CT_Batch* ct_batch_create(CT_Texture* atlas, unsigned size)
+CT_Batch* ct_batch_create(unsigned size)
 {
 	CT_Batch* batch = smalloc(sizeof(CT_Batch));
 	batch->vector  = dv_vector_new(16, size);
@@ -683,7 +683,6 @@ CT_Batch* ct_batch_create(CT_Texture* atlas, unsigned size)
 		batch->indices[(i*6)+4] = 2 + (i*4);
 		batch->indices[(i*6)+5] = 3 + (i*4);
 	}
-	batch->atlas = atlas;
 	return batch;
 }
 
@@ -711,11 +710,11 @@ void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans)
 	vertex_data(trans, dv_vector_ref(batch->vector, id));
 }
 
-void ct_batch_render(CT_Batch* batch)
+void ct_batch_render(CT_Batch* batch, CT_Texture* atlas)
 {
 	DV_Vector* vector = batch->vector;
 	glUseProgram(default_shader()->gl_program_id);
-	glBindTexture(GL_TEXTURE_2D, batch->atlas->gl_texture_id);
+	glBindTexture(GL_TEXTURE_2D, atlas->gl_texture_id);
 	shader_upload_modelview_matrix(default_shader(), camera_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -827,6 +826,16 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 	CT_Texture* tex = ct_image_to_texture(image);
 	ct_image_free(image);
 	return tex;
+}
+
+/* Part */
+
+CT_Part* ct_part_create(CT_Texture* texture, float* rect)
+{
+	CT_Part* part = malloc(sizeof(CT_Part));
+	part->texture = texture;
+	memcpy(part->rect, rect, sizeof(float)*4);
+	return part;
 }
 
 /* Transformation */
