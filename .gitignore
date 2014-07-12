@@ -3,3 +3,4 @@
 /core.o
 /dynvector/dynvector.o
 /hypermath/hypermath.o
+/input.o
