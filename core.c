@@ -1,4 +1,4 @@
-#include "coati.h"
+#include "core.h"
 #include <string.h>
 #include <assert.h>
 #include <math.h>
@@ -826,16 +826,6 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 	CT_Texture* tex = ct_image_to_texture(image);
 	ct_image_free(image);
 	return tex;
-}
-
-/* Part */
-
-CT_Part* ct_part_create(CT_Texture* texture, float* rect)
-{
-	CT_Part* part = malloc(sizeof(CT_Part));
-	part->texture = texture;
-	memcpy(part->rect, rect, sizeof(float)*4);
-	return part;
 }
 
 /* Transformation */

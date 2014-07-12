@@ -212,12 +212,6 @@ typedef struct _CT_Font
 	
 } CT_Font;
 
-typedef struct _CT_Part
-{
-	CT_Texture* texture;
-	float rect[4];
-} CT_Part;
-
 /* Error */
 
 extern const char* ct_get_error();
