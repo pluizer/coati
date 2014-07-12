@@ -1,1 +1,5 @@
 /build/libcoati.so
+/audio.o
+/core.o
+/dynvector/dynvector.o
+/hypermath/hypermath.o
