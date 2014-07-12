@@ -1,4 +1,4 @@
-SOURCES = dynvector/dynvector.o hypermath/hypermath.o core.o
+SOURCES = dynvector/dynvector.o hypermath/hypermath.o audio.o core.o
 INCLUDE = -I./hypermath -I./dynvector -I./include
 LIBS    = `pkg-config --libs --cflags SDL2_ttf sdl2 SDL2_image glew` -lm
 CFLAGS  = -g3 -DDEBUG -Wall -pedantic -std=c11 -fPIC
@@ -8,6 +8,9 @@ PREFIX  = /usr/local
 all: $(SOURCES)
 	mkdir -p build
 	$(CC) -shared  $(CFLAGS) $(SOURCES) $(INCLUDE) $(LIBS) -o $(TARGET)
+
+audio.o: audio.c include/audio.h
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 core.o: core.c include/core.h
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
