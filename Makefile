@@ -23,7 +23,7 @@ hypermath/hypermath.o: hypermath/hypermath.c hypermath/hypermath.h
 
 install: $(TARGET)
 	install $(TARGET) $(PREFIX)/lib
-	cp -r include/ $(PREFIX)/include/coati
+	cp -r include/* $(PREFIX)/include/coati
 	ldconfig $(PREFIX)/lib
 
 uninstall:
