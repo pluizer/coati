@@ -22,8 +22,6 @@ extern CT_Sample* ct_sample_load(const char* filename);
 
 extern void ct_sample_free(CT_Sample* sample);
 
-extern CT_Channel* ct_sample_play(CT_Sample* sample, float* position, int loop);
-
 /* 
    Sample radius
    The radius in which a sample can be heard. The volume of a sample
@@ -35,13 +33,15 @@ extern float ct_sample_radius();
 
 /* Channel */
 
-extern int ct_is_channel_active(CT_Channel* channel);
+extern CT_Channel ct_sample_play(CT_Sample* sample, float* position, int loop);
 
-extern void ct_channel_position_get(CT_Channel* channel, float* position);
+extern int ct_is_channel_active(CT_Channel channel);
 
-extern void ct_channel_position(CT_Channel* channel, float* ret);
+extern void ct_channel_position_get(CT_Channel channel, float* position);
 
-extern void ct_channel_stop(CT_Channel* channel, int fadeout_ms);
+extern void ct_channel_position(CT_Channel channel, float* ret);
+
+extern void ct_channel_stop(CT_Channel channel, int fadeout_ms);
 
 /* Track */
 
