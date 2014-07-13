@@ -309,7 +309,7 @@ CT_Image* ct_image_load(const char* filename)
 	if (sur == NULL)
 	{
 		char str[1024];
-		sprintf(str, "Could not load file: %s", filename);
+		sprintf(str, "Could not load image file: %s", filename);
 		ct_set_error(str);
 		return NULL;
 	}
@@ -832,7 +832,7 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 
 CT_Transformation* ct_array_to_transformation(float* array)
 {
-	CT_Transformation* trans = malloc(sizeof(CT_Transformation));
+	CT_Transformation* trans = smalloc(sizeof(CT_Transformation));
 	memcpy(trans, array, sizeof(CT_Transformation));
 	return trans;
 }
