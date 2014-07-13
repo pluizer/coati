@@ -2,7 +2,7 @@ SOURCES = dynvector/dynvector.o hypermath/hypermath.o audio.o core.o input.o
 INCLUDE = -I./hypermath -I./dynvector -I./include
 LIBS    = `pkg-config --libs --cflags SDL2_ttf sdl2 SDL2_image SDL2_mixer glew` -lm
 CFLAGS  = -g3 -DDEBUG -Wall -pedantic -std=c11 -fPIC
-TARGET  = build/libcoati.so
+TARGET  = libcoati.so
 PREFIX  = /usr/local
 
 all: $(SOURCES)
@@ -26,7 +26,8 @@ hypermath/hypermath.o: hypermath/hypermath.c hypermath/hypermath.h
 
 install: $(TARGET)
 	install $(TARGET) $(PREFIX)/lib
-	cp -r include/* $(PREFIX)/include/coati
+	install -d $(PREFIX)/include/coati
+	install include/*  $(PREFIX)/include/coati
 	ldconfig $(PREFIX)/lib
 
 uninstall:
