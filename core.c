@@ -22,6 +22,25 @@ static float colour_white[4] = { 1, 1, 1, 1 };
 #define CHECK_GL()
 #endif
 
+static void push_everything(CT_Texture* target, 
+			    float* colour, 
+			    float* pos, float scale, float rotation,
+			    CT_BlendMode blend_mode)
+{
+	ct_target_push(target);
+	ct_colour_push(colour);
+	ct_camera_push(pos, scale, rotation);
+	ct_blend_mode_push(blend_mode);
+}
+
+static void pop_everything()
+{
+	ct_target_pop();
+	ct_colour_pop();
+	ct_camera_pop();
+	ct_blend_mode_pop();
+}
+
 void* smalloc(size_t size)
 {
 	void* ptr = malloc(size);
@@ -548,15 +567,12 @@ CT_Texture* ct_texture_copy(CT_Texture* texture)
 		-1, -1 };
 	float idem[16]; hpmIdentityMat4(idem);
 	float pos[] = {0, 0};
-	ct_blend_mode_push(CT_BLEND_MODE_NORMAL);
-	ct_target_push(tex);
-	ct_colour_push(colour_white);
-	ct_camera_push(pos, 1, 0);
+	push_everything(tex, 
+			colour_white, 
+			pos, 1, 0,
+			CT_BLEND_MODE_NORMAL);
 	ct_texture_render(texture, &trans);
-	ct_camera_pop();
-	ct_colour_pop();
-	ct_target_pop();
-	ct_blend_mode_pop();
+	pop_everything();
 	return tex;
 }
 
