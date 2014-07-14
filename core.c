@@ -547,9 +547,14 @@ CT_Texture* ct_texture_copy(CT_Texture* texture)
 		{ 0, 0 }, 0,
 		-1, -1 };
 	float idem[16]; hpmIdentityMat4(idem);
+	float pos[] = {0, 0};
 	ct_blend_mode_push(CT_BLEND_MODE_NORMAL);
 	ct_target_push(tex);
-	//ct_texture_render(texture, idem, &trans);
+	ct_colour_push(colour_white);
+	ct_camera_push(pos, 1, 0);
+	ct_texture_render(texture, &trans);
+	ct_camera_pop();
+	ct_colour_pop();
 	ct_target_pop();
 	ct_blend_mode_pop();
 	return tex;
