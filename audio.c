@@ -84,7 +84,8 @@ static void calc_mix_angle_and_distance(float* pos, Sint16* r_angle, Uint8* r_di
 	float delta_y = pos[1] - .5;
 	float dist = sqrt(delta_x*delta_x + delta_y*delta_y);
 	*r_distance = (Uint8)MIN((255.0 / sample_radius) * dist, 255);
-	/* we don't have 3d sound, just stereo */
+	/* Fixme: doesnt really work */
+	/* *r_angle = atan2(delta_y, delta_x) * (180 / 3.14); */
 	*r_angle = (delta_x > 0) ? 90 : 270;
 	printf("%f, %d\n", delta_x, *r_angle);
 }
