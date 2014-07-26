@@ -6,12 +6,8 @@
 extern const char* ct_get_error();
 extern void ct_set_error(const char* str);
 extern void* smalloc(size_t size);
-#ifndef MIN
-#define MIN(a,b) (((a)<(b))?(a):(b)) 
-#endif
-#ifndef MAX
-#define MAX(a,b) (((a)>(b))?(a):(b))
-#endif
+
+#define CAP(v,min,max) ((v)>(max))?(max):((v)<(min))?(min):(v)
 
 static int is_sound_inited = 0;
 
@@ -65,7 +61,7 @@ void ct_sample_free(CT_Sample* sample)
 
 /* Sample radius */
 
-static float sample_radius = 1.0;
+static float sample_radius = .5;
 
 void ct_sample_radius_set(float value)
 {
@@ -77,27 +73,33 @@ float ct_sample_radius()
 	return sample_radius;
 }
 
-static void calc_mix_angle_and_distance(float* pos, Sint16* r_angle, Uint8* r_distance)
+static void calc_mix_panning(float* pos, Uint8* left, Uint8* right, Uint8* r_distance)
 {
-	/* Assumes listener is at the centre of the screen */
+	/* FIXME?
+	   Assumes 'microphones' are .5 units away from the centre if the camera.
+	   Maybe this should scale when zooming out.
+	*/
 	float delta_x = pos[0] - .5;
 	float delta_y = pos[1] - .5;
 	float dist = sqrt(delta_x*delta_x + delta_y*delta_y);
-	*r_distance = (Uint8)MIN((255.0 / sample_radius) * dist, 255);
-	/* Fixme: doesnt really work */
-	/* *r_angle = atan2(delta_y, delta_x) * (180 / 3.14); */
-	*r_angle = (delta_x > 0) ? 90 : 270;
-	printf("%f, %d\n", delta_x, *r_angle);
+	*r_distance = (Uint8)CAP((255.0 / sample_radius) * dist, 0, 255);
+	*right = (Uint8)CAP((128 * (delta_x/.5)) + 128, 0, 255);
+	*left = 255-*right;
+	*right *= sample_radius - (CAP(dist, 0, 1)/sample_radius);
+	*left  *= sample_radius - (CAP(dist, 0, 1)/sample_radius);
+
+	printf("L: %f:%d, R: %f:%d\n", delta_x, (int)*left, delta_x, (int)*right);
 }
 
 /* Channel */
 
 CT_Channel ct_sample_play(CT_Sample* sample, float* position, int loop)
 {
-	Sint16 angle;
-	Uint8  dist;
-	calc_mix_angle_and_distance(position, &angle, &dist);
+	Uint8 left;
+	Uint8 right;
+	Uint8 dist;
+	calc_mix_panning(position, &left, &right, &dist);
 	CT_Channel channel = Mix_PlayChannel(-1, sample->mix_chunk, loop);
-	Mix_SetPosition(channel, angle, dist);
+	Mix_SetPanning(channel, left, right);
 	return channel;
 }

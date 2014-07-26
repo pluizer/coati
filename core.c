@@ -1,9 +1,9 @@
 #include "core.h"
+#include "hypermath.h"
+#include "dynvector.h"
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-#include <hypermath.h>
-#include <dynvector.h>
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>

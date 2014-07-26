@@ -1,13 +1,11 @@
-A simple, small and fast 2D game programming library written in C, with the focus on being easy to bind to other languages.
-
+A simple, small and fast 2D game programming library for Chicken Scheme.
 - Version: 0.1
 - Author: Richard van Roy (pluizer)
 - Project: [[https://github.com/pluizer/coati]]
 - License: [[http://opensource.org/licenses/MIT][MIT]]
 
 * Installation
-: make
-: make install
+: chicken-install
 
 * Dependencies
 - [[http://www.libsdl.org/index.php][SDL 2.0]]
@@ -18,4 +16,3 @@ A simple, small and fast 2D game programming library written in C, with the focu
 
 * Not yet done
 - Examples
-- Sound

@@ -1,0 +1,4 @@
+((author "Richard van Roy")
+ (synopsis "")
+ (files "coati.setup" "coati.scm"))
+	 	  
