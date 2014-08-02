@@ -10,7 +10,6 @@
 <#
 
 ;; Binding helpers
-
 ;; (bind-coati NAME RET-TYPE VAR-TYPES [FUNC/OPTION])
 ;; RET-TYPE 	: foreign-type
 ;;		: (xxx-vector size)
@@ -84,8 +83,8 @@
 		   ((and (list? func/option)
 			 (eq? (car func/option) (inject 'parameter)))
 		    (let ((vars (unique-symbols (length var-types)))
-			  ;; Use 'not-supplied instead of nothing (#f) so it is possible
-			  ;; to pass #f as a value.
+			  ;; Use 'not-supplied instead of nothing (#f) so it is 
+			  ;; possible to pass #f as a value.
 			  (not-supplied (gensym 'not-supplied)))
 		      `(define (,name ,@vars #!optional (value ',not-supplied))
 			 (if (eq? value ',not-supplied)
@@ -106,6 +105,31 @@
      (begin (define-foreign-type type foreign-type)
 	    (define scheme-symbol
 	      (foreign-value c-symbol type)) ...))))
+
+;; Misc
+(define (uber-ref obj index)
+  ;; Sorted by likely order of prevalence.
+  ((cond 
+    ((f32vector? obj) f32vector-ref)
+    ((s32vector? obj) s32vector-ref)
+    ((u32vector? obj) u32vector-ref)
+    ((list?      obj) list-ref)
+    ((vector?    obj) vector-ref)
+    ((u8vector?  obj) u8vector-ref)
+    ((s8vector?  obj) s8vector-ref)
+    ((u16vector? obj) u16vector-ref)
+    ((s16vector? obj) s16vector-ref)
+    ((f64vector? obj) f64vector-ref)) 
+  obj index))
+
+(define (:x vec)
+  (uber-ref vec 0))
+
+(define (:y vec)
+  (uber-ref vec 1))
+
+(define (:z vec)
+  (uber-ref vec 2))
 
 ;; Error
 (bind-coati get-error c-string ())
@@ -230,6 +254,7 @@
 	    (finally %sample:free))
 (bind-coati sample:play channel (sample f32vector bool))
 
+;; Keys
 (define-foreign-enum* (key (enum "_CT_Key"))
   (key:backspace CT_KEY_BACKSPACE)
   (key:tab CT_KEY_TAB)
