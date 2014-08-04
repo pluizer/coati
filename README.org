@@ -13,6 +13,7 @@ A simple, small and fast 2D game programming library for Chicken Scheme.
 - [[https://www.libsdl.org/projects/SDL_ttf/][SDL_ttf 2.0]]
 - [[https://www.libsdl.org/projects/SDL_mixer/][SDL_mixer 2.0]]
 - [[http://glew.sourceforge.net/][GLEW]]
+- [[https://github.com/pluizer/mystruct][mystruct]]
 
 * Not yet done
 - Examples
