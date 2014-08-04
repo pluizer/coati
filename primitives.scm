@@ -356,7 +356,7 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
 	       (- (rect:b rect) (vect:y vect))))
 
 ; Adds a vector to a rectangle.
-(define (rect- rect vect)
+(define (rect+ rect vect)
   (rect:create (+ (rect:r rect) (vect:x vect))
 	       (+ (rect:l rect) (vect:x vect))
 	       (+ (rect:t rect) (vect:y vect))
