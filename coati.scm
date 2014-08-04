@@ -257,6 +257,17 @@ SOFTWARE.
      (begin (%camera:push position scale rotation) form ... (%camera:pop)))))
 
 
+;; Transformation
+(define (trans source-rect #!key
+	       (dest-rect source-rect)
+	       (origin (vect:create 0 0))
+	       (rotation 0)
+	       (flip-h -1)
+	       (flip-v -1))
+  (flatten (f32vector->list source-rect)
+	   (f32vector->list dest-rect)
+	   (f32vector->list origin)
+	   rotation flip-h flip-v))
 ;; Input
 (bind-coati quitting? bool ())
 (bind-coati key:pressed? bool (key))
