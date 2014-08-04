@@ -4,3 +4,7 @@
 /hypermath/hypermath.o
 /input.o
 /libcoati.so
+/coati.import.scm
+/coati.import.so
+/coati.so
+/triangulate.cc
