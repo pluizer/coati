@@ -228,8 +228,8 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
 ;-------------------------------------------------------
 
 ; Returs a new bounding box.
-(define (rect:create l b r t)
-  (f32vector l b r t))
+(define (rect:create l r b t)
+  (f32vector l r b t))
 
 ; Can also be a line.
 (define (rect? obj)
@@ -239,10 +239,10 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
 (define (rect:l rect)
   (f32vector-ref rect 0))
 
-(define (rect:b rect)
+(define (rect:r rect)
   (f32vector-ref rect 1))
 
-(define (rect:r rect)
+(define (rect:b rect)
   (f32vector-ref rect 2))
 
 (define (rect:t rect)
@@ -361,6 +361,7 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
 	       (+ (rect:l rect) (vect:x vect))
 	       (+ (rect:t rect) (vect:y vect))
 	       (+ (rect:b rect) (vect:y vect))))
+
 
 ;-------------------------------------------------------
 ; Lines
