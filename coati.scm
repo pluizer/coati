@@ -146,14 +146,12 @@ SOFTWARE.
     ((f64vector? obj) f64vector-ref)) 
   obj index))
 
-(define (:x vec)
-  (uber-ref vec 0))
-
-(define (:y vec)
-  (uber-ref vec 1))
-
-(define (:z vec)
-  (uber-ref vec 2))
+(define-syntax pop-cycle
+  (syntax-rules ()
+    ((_ lst)
+     (let ((ret (car lst)))
+       (set! lst (append (cdr lst) (list ret)))
+       ret))))
 
 ;; Error
 (bind-coati get-error c-string ())
@@ -445,4 +443,5 @@ SOFTWARE.
   (button:wheeldown CT_BUTTON_WHEELDOWN)
   (button:x1 CT_BUTTON_X1)
   (button:x2 CT_BUTTON_X2))
+
 )
