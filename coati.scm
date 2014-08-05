@@ -299,6 +299,84 @@ SOFTWARE.
 	    (finally %sample:free))
 (bind-coati sample:play channel (sample f32vector bool))
 
+;; Sprite
+(define-mystruct sprite
+  (rect))
+
+(define-general :rect sprite? sprite:rect)
+
+;; Animation sprite
+(define-mystruct animation
+  (rects
+   (interval value: (/ 1000 20))
+   (%epoch   value: (current-milliseconds))))
+
+(define (animation:new-frame? ani)
+  (> (- (current-milliseconds)
+	(animation:%epoch ani))
+     (animation:interval ani)))
+
+(define (animation:rect ani)
+  (when (animation:new-frame? ani)
+	(pop-cycle (animation:rects ani))
+	(set! (animation:%epoch ani) (current-milliseconds)))
+  (car (animation:rects ani)))
+
+(define-general :rect animation? animation:rect)
+
+(define-general :new-frame animation? animation:new-frame?)
+
+;; Sprite batch
+(define-mystruct sprite-batch
+  (max-size
+   (%closures value: (list))
+   (%batch value: (batch:create max-size))))
+
+(define (sprite-batch:push sbatch sprite)
+  (let* ((batch (sprite-batch:%batch sbatch))
+	 (translation (trans:create (:rect sprite)))
+	 (id (batch:push batch translation))
+	 (c-position (vect:create 0 0))
+	 (c-origin   (vect:create 0 0))
+	 (c-rotation 0)
+	 (c-scale    (vect:create 1 1))
+	 (c-flip-h   #f)
+	 (c-flip-v   #f)
+	 (closure
+	  (lambda (#!key position 
+			 origin
+			 rotation
+			 (scale (vect:create 1 1)) 
+			 flip-h flip-v
+			 remove)
+	    (if remove (batch:remove batch id)
+		(begin
+		  (when position (set! c-position position))
+		  (when origin   (set! c-origin   origin))
+		  (when rotation (set! c-rotation rotation))
+		  (when scale    (set! c-scale    scale ))
+		  (when flip-h   (set! c-flip-h   flip-h))
+		  (when flip-v   (set! c-flip-v   flip-v))
+		  (let* ((rect (:rect sprite))
+			 (x (vect:x c-position))
+			 (y (vect:y c-position))
+			 (w (- (rect:r rect) (rect:l rect)))
+			 (h (- (rect:t rect) (rect:b rect))))
+		    (batch:change batch id
+				  (trans:make rect
+					      dest-rect:
+					      (rect:create x (+ w x) y (+ h y))
+					      origin: c-origin
+					      rotation: c-rotation
+					      flip-h: c-flip-h
+					      flip-v: c-flip-v))))))))
+    (set! (sprite-batch:%closures sbatch)
+	  (cons closure (sprite-batch:%closures sbatch)))
+    closure))
+
+(define (sprite-batch:poll-animations sbatch)
+  (for-each (lambda (x) (x)) (sprite-batch:%closures sbatch)))
+
 ;; Keys
 (define-foreign-enum* (key (enum "_CT_Key"))
   (key:backspace CT_KEY_BACKSPACE)
