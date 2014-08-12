@@ -377,6 +377,9 @@ SOFTWARE.
 (define (sprite-batch:poll-animations sbatch)
   (for-each (lambda (x) (x)) (sprite-batch:%closures sbatch)))
 
+(define (sprite-batch:render sbatch texture)
+  (batch:render (sprite-batch:%batch sbatch) texture))
+
 ;; Keys
 (define-foreign-enum* (key (enum "_CT_Key"))
   (key:backspace CT_KEY_BACKSPACE)
