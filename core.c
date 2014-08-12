@@ -986,3 +986,15 @@ void ct_camera_pop()
 	}
 	camera_stack.size--;
 }
+
+void ct_camera_rect(float* rect)
+{
+	CT_Camera* cam = current_camera();
+	float l = 1 / cam->scale;
+	float x = cam->position[0];
+	float y = cam->position[1];
+	rect[0] = (1-(l/2)-.5)+x;
+	rect[1] = rect[0] + l;
+	rect[2] = (1-(l/2)-.5)+y;
+	rect[3] = rect[2] + l;
+}

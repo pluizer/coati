@@ -249,11 +249,12 @@ SOFTWARE.
 ;; Camera
 (bind-coati %camera:push void (f32vector float float))
 (bind-coati %camera:pop void ())
+; Note that camera's do not nest.
 (define-syntax with-camera
   (syntax-rules ()
     ((_ (position scale rotation) form ...)
      (begin (%camera:push position scale rotation) form ... (%camera:pop)))))
-
+(bind-coati camera:rect (f32vector 4) ())
 
 ;; Trans
 (define (trans:create source-rect #!optional
