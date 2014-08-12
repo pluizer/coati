@@ -916,6 +916,9 @@ static void vertex_data(CT_Transformation* tran, float* data)
 typedef struct _CT_Camera
 {
 	float matrix[16];
+	float position[2];
+	float scale;
+	float rotation;
 } CT_Camera;
 
 static struct
@@ -928,7 +931,8 @@ static struct
 	{{ 1, 0, 0, 0,
 	   0, 1, 0, 0,
 	   0, 0, 1, 0,
-	   0, 0, 0, 1 }}};
+	   0, 0, 0, 1 },
+	 {0, 0}, 1, 0}};
 
 static CT_Camera* current_camera()
 {
@@ -962,8 +966,12 @@ void ct_camera_push(float* position, float scale, float rotation)
 		ct_set_error("Stack overflow");
 		camera_stack.size = 0;
 	}
-	adjust_camera_matrix(&camera_stack.stack[camera_stack.size++],
-			     position, scale, rotation);
+	CT_Camera* cam = &camera_stack.stack[camera_stack.size++];
+	adjust_camera_matrix(cam, position, scale, rotation);
+	cam->position[0] = position[0];
+	cam->position[1] = position[1];
+	cam->scale = scale;
+	cam->rotation = rotation;
 }
 
 void ct_camera_pop()
