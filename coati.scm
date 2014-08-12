@@ -254,6 +254,7 @@ SOFTWARE.
   (syntax-rules ()
     ((_ (position scale rotation) form ...)
      (begin (%camera:push position scale rotation) form ... (%camera:pop)))))
+; Returns the screens bb ignoring rotation 
 (bind-coati camera:rect (f32vector 4) ())
 
 ;; Trans

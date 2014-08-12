@@ -183,4 +183,7 @@ extern void ct_camera_push(float* position, float scale, float rotation);
 
 extern void ct_camera_pop();
 
+/* Returns the screens bb ignoring rotation */
+extern void ct_camera_rect(float* rect);
+
 #endif /* __core_h__ */	
