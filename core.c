@@ -921,14 +921,14 @@ typedef struct _CT_Camera
 static struct
 {
 	CT_Camera default_cam;
-	CT_Camera stack[CT_MAX_COLOUR_STACK_SIZE];
+	CT_Camera stack[CT_MAX_CAMERA_STACK_SIZE];
 	unsigned size;
 } camera_stack = {
 	.default_cam =
 	{{ 1, 0, 0, 0,
-	    0, 1, 0, 0,
-	    0, 0, 1, 0,
-	    0, 0, 0, 1 }}};
+	   0, 1, 0, 0,
+	   0, 0, 1, 0,
+	   0, 0, 0, 1 }}};
 
 static CT_Camera* current_camera()
 {
