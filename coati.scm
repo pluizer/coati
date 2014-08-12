@@ -360,8 +360,10 @@ SOFTWARE.
 		  (let* ((rect (:rect sprite))
 			 (x (vect:x c-position))
 			 (y (vect:y c-position))
-			 (w (- (rect:r rect) (rect:l rect)))
-			 (h (- (rect:t rect) (rect:b rect))))
+			 (w (* (- (rect:r rect) (rect:l rect))
+			       (vect:x c-scale)))
+			 (h (* (- (rect:t rect) (rect:b rect))
+			       (vect:y c-scale))))
 		    (batch:change batch id
 				  (trans:make rect
 					      dest-rect:
