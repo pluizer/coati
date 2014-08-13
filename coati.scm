@@ -23,7 +23,7 @@ SOFTWARE.
 (module coati
 	*
 	(import chicken scheme foreign extras irregex)
-	(use srfi-1 data-structures srfi-4 foreigners mystruct)
+	(use srfi-1 data-structures srfi-4 foreigners mystruct lolevel)
 	(import-for-syntax matchable clojurian-syntax)
 	(include "primitives.scm")
 #>
@@ -217,9 +217,6 @@ SOFTWARE.
 
 ;; Transformation
 (define-foreign-type transformation (c-pointer "CT_Transformation"))
-(bind-coati array->transformation transformation (f32vector)
-	    (finally %transformation:free))
-(bind-coati %transformation:free void (transformation))
 
 ;; Target
 (bind-coati %target:push void (texture))
@@ -265,8 +262,7 @@ SOFTWARE.
 		      (rotation 0)
 		      flip-h
 		      flip-v)
-  (array->transformation
-   (apply f32vector (flatten (f32vector->list source-rect)
+  (make-locative (apply f32vector (flatten (f32vector->list source-rect)
 			     (f32vector->list dest-rect)
 			     (f32vector->list origin)
 			     rotation (if flip-h 1 -1) (if flip-v 1 -1)))))
