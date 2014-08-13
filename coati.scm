@@ -328,7 +328,7 @@ SOFTWARE.
 ;; Sprite batch
 (define-mystruct sprite-batch
   (max-size
-   (%closures value: (list))
+   (%handles value: (list))
    (%batch value: (batch:create max-size))))
 
 (define (sprite-batch:push sbatch sprite)
@@ -341,14 +341,20 @@ SOFTWARE.
 	 (c-scale    (vect:create 1 1))
 	 (c-flip-h   #f)
 	 (c-flip-v   #f)
-	 (closure
+	 (handle
 	  (lambda (#!key position 
 			 origin
 			 rotation
 			 (scale (vect:create 1 1)) 
 			 flip-h flip-v
 			 remove)
-	    (if remove (batch:remove batch id)
+	    (if remove 
+		(begin
+		  ;; Remove this handle from the table.
+		  (set! (sprite-batch:%handles sbatch) 
+			(alist-delete! id (sprite-batch:%handles sbatch)))
+		  ;; Remove it from the batch.
+		  (batch:remove batch id))
 		(begin
 		  (when position (set! c-position position))
 		  (when origin   (set! c-origin   origin))
@@ -371,12 +377,15 @@ SOFTWARE.
 					      rotation: c-rotation
 					      flip-h: c-flip-h
 					      flip-v: c-flip-v))))))))
-    (set! (sprite-batch:%closures sbatch)
-	  (cons closure (sprite-batch:%closures sbatch)))
-    closure))
+    ;; Store the handle, so it can be polled if it is an animation.
+    ;; We store it by id, else we cannot delete in inside the handle
+    ;; closure.
+    (set! (sprite-batch:%handles sbatch)
+	  (cons (cons id handle) (sprite-batch:%handles sbatch)))
+    handle))
 
 (define (sprite-batch:poll-animations sbatch)
-  (for-each (lambda (x) (x)) (sprite-batch:%closures sbatch)))
+  (for-each (lambda (x) (cdr x)) (sprite-batch:%handles sbatch)))
 
 (define (sprite-batch:render sbatch texture)
   (batch:render (sprite-batch:%batch sbatch) texture))
