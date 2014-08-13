@@ -1,14 +1,14 @@
 #ifndef __dynvector_h_
 #define __dynvector_h_
 
-typedef struct _DV_IndexStack DV_IndexStack;
+struct _DV_IndexStack;
 
 typedef struct _DV_Vector
 {
 	float* data;
 	unsigned* indices;
-	DV_IndexStack* available_stack;
-	DV_IndexStack* last_stack;
+	struct _DV_IndexStack* available_stack;
+	struct _DV_IndexStack* last_stack;
 	unsigned size;
 	unsigned max_size;
 	unsigned chunk_size;
