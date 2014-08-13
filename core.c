@@ -745,6 +745,11 @@ void ct_batch_render(CT_Batch* batch, CT_Texture* atlas)
 	CHECK_GL();
 }
 
+unsigned ct_batch_size(CT_Batch* batch)
+{
+	return batch->vector->size;
+}
+
 /* Font */
 
 CT_Font* ct_font_load(const char* filename)

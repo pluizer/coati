@@ -238,6 +238,7 @@ SOFTWARE.
 (bind-coati batch:remove void (batch unsigned-int))
 (bind-coati batch:change void (batch unsigned-int transformation))
 (bind-coati batch:render void (batch texture))
+(bind-coati batch:size unsigned-int (batch))
 
 ;; Font
 (define-foreign-type font (c-pointer "CT_Font"))
@@ -254,7 +255,7 @@ SOFTWARE.
   (syntax-rules ()
     ((_ (position scale rotation) form ...)
      (begin (%camera:push position scale rotation) form ... (%camera:pop)))))
-; Returns the screens bb ignoring rotation 
+; Returns the screens bb ignoring rotation
 (bind-coati camera:rect (f32vector 4) ())
 
 ;; Trans
