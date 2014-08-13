@@ -8,3 +8,5 @@
 /coati.import.so
 /coati.so
 /triangulate.cc
+/a.out
+/dynvector_test.c

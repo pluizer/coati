@@ -75,7 +75,7 @@ unsigned dv_vector_push(DV_Vector* dv, float* chunk)
 		? dv->size : index_stack_pop(dv->available_stack);
 	assert(dv->size < dv->max_size);
 	memcpy(dv->data+(dv->size*dv->chunk_size), chunk, dv->chunk_size*sizeof(float));
-	dv->indices[dv->size] = index;
+	dv->indices[index] = dv->size;
 	dv->size++;
 	index_stack_push(dv->last_stack, index);
 	return index;
@@ -89,7 +89,10 @@ void dv_vector_remove(DV_Vector* dv, unsigned index)
 		memcpy(dv->data+(dv->chunk_size * dv->indices[index]),
 		       dv->data+(dv->chunk_size * (dv->size)),
 		       dv->chunk_size * sizeof(float));
-		dv->indices[index_stack_pop(dv->last_stack)] = dv->indices[index];
+		unsigned last = index_stack_pop(dv->last_stack);
+		dv->indices[last] = dv->indices[index];
+	} else {
+		index_stack_pop(dv->last_stack);
 	}
 	index_stack_push(dv->available_stack, index);
 }
