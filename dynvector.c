@@ -40,7 +40,7 @@ int index_stack_empty(DV_IndexStack* is)
 unsigned index_stack_pop(DV_IndexStack* is)
 {
 	assert(!index_stack_empty(is));
-	return is->data[is->size - 1];
+	return is->data[--is->size];
 }
 
 DV_Vector* dv_vector_new(unsigned chunk_size, unsigned max_size)
