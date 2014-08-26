@@ -27,9 +27,9 @@ SOFTWARE.
 	(import-for-syntax matchable clojurian-syntax)
 	(include "primitives.scm")
 #>
-#include <coati/audio.h>
-#include <coati/core.h>
-#include <coati/input.h>
+#include "audio.h"
+#include "core.h"
+#include "input.h"
 #include <float.h>
 <#
 
