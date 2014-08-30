@@ -111,7 +111,8 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
   (if b (vect:create (- (vect:x a) (vect:x b))
 		   (- (vect:y a) (vect:y b)))
       (vect:create (- (vect:x a))
-		 (- (vect:y a)))))
+		   (- (vect:y a)))))
+
 
 ; Scalar multiplication.
 (define (vect* v s)
