@@ -390,6 +390,11 @@ SOFTWARE.
 (define (sprite-batch:render sbatch texture)
   (batch:render (sprite-batch:%batch sbatch) texture))
 
+(define (sprite-batch:clear sbatch)
+  (for-each (lambda (handle)
+	      (handle remove: #t))
+	    (sprite-batch:%handles sbatch)))
+
 ;; Keys
 (define-foreign-enum* (key (enum "_CT_Key"))
   (key:backspace CT_KEY_BACKSPACE)
