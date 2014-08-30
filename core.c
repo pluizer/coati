@@ -981,7 +981,7 @@ float* current_matrix()
 	return current_trans()->matrix;
 }
 
-void ct_camera_rect(float* rect)
+void ct_screen_rect(float* rect)
 {
 	CT_Trans* trans = current_trans();
 	float l = 1 / trans->scale;
