@@ -148,7 +148,7 @@ extern void ct_target_pop();
 
 /* Batch */
 
-extern CT_Batch* ct_batch_create(unsigned size);
+extern CT_Batch* ct_batch_create(unsigned size_hint);
 
 extern void ct_batch_free(CT_Batch* batch);
 

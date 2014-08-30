@@ -52,6 +52,17 @@ void* smalloc(size_t size)
 	return ptr;
 }
 
+void* srealloc(void* old, size_t size)
+{
+	void* ptr = realloc(old, size);
+	if (!ptr)
+	{
+		fprintf(stderr, "Out of memory!");
+		exit(-1);
+	}
+	return ptr;
+}
+
 static void swap_float(float* a, float* b)
 {
 	float t = *a;
@@ -690,13 +701,13 @@ void ct_target_pop()
 
 /* Batch */
 
-CT_Batch* ct_batch_create(unsigned size)
+CT_Batch* ct_batch_create(unsigned size_hint)
 {
 	CT_Batch* batch = smalloc(sizeof(CT_Batch));
-	batch->vector  = dv_vector_new(16, size);
-	batch->indices = smalloc(sizeof(unsigned short)*size*6);
-	unsigned int i=0;
-	for (i=0; i<size; i++) {
+	batch->vector  = dv_vector_new(16, size_hint);
+	batch->indices = smalloc(sizeof(unsigned short)*size_hint*6);
+	unsigned i;
+	for (i=0; i<size_hint; i++) {
 		batch->indices[(i*6)+0] = 0 + (i*4);
 		batch->indices[(i*6)+1] = 1 + (i*4);
 		batch->indices[(i*6)+2] = 2 + (i*4);
@@ -717,8 +728,27 @@ void ct_batch_free(CT_Batch* batch)
 unsigned ct_batch_push(CT_Batch* batch, CT_Transformation* trans)
 {
 	
+	unsigned grown_by;
 	float data[16]; vertex_data(trans, data);
-	return dv_vector_push(batch->vector, data);
+	unsigned id = dv_vector_push(batch->vector, data, &grown_by);
+	/* If vector has grown, grow indices array with it. */
+	if (grown_by)
+	{
+		unsigned size = dv_vector_current_capacity(batch->vector);
+		batch->indices = srealloc(batch->indices, 
+					  sizeof(unsigned short)*size*6);
+		unsigned i;
+		/* Populate new indicies */
+		for (i=size-grown_by; i<size; i++) {
+			batch->indices[(i*6)+0] = 0 + (i*4);
+			batch->indices[(i*6)+1] = 1 + (i*4);
+			batch->indices[(i*6)+2] = 2 + (i*4);
+			batch->indices[(i*6)+3] = 0 + (i*4);
+			batch->indices[(i*6)+4] = 2 + (i*4);
+			batch->indices[(i*6)+5] = 3 + (i*4);
+		}
+	}
+	return id;
 }
 
 void ct_batch_remove(CT_Batch* batch, unsigned id)
