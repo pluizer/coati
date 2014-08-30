@@ -326,10 +326,11 @@ SOFTWARE.
 (define-general :new-frame animation? animation:new-frame?)
 
 ;; Sprite batch
+(define sprite-batch:default-size-hint (make-parameter 20))
+
 (define-mystruct sprite-batch
-  (max-size
-   (%handles value: (list))
-   (%batch value: (batch:create max-size))))
+  ((%handles value: (list))
+   (%batch value: (batch:create (sprite-batch:default-size-hint)))))
 
 (define (sprite-batch:push sbatch sprite)
   (let* ((batch (sprite-batch:%batch sbatch))
