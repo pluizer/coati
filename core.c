@@ -1,6 +1,7 @@
 #include "core.h"
 #include "hypermath.h"
 #include "dynvector.h"
+#include "aux.h"
 #include <string.h>
 #include <assert.h>
 #include <math.h>
@@ -39,28 +40,6 @@ static void pop_everything()
 	ct_colour_pop();
 	ct_translation_pop();
 	ct_blend_mode_pop();
-}
-
-void* smalloc(size_t size)
-{
-	void* ptr = malloc(size);
-	if (!ptr)
-	{
-		fprintf(stderr, "Out of memory!");
-		exit(-1);
-	}
-	return ptr;
-}
-
-void* srealloc(void* old, size_t size)
-{
-	void* ptr = realloc(old, size);
-	if (!ptr)
-	{
-		fprintf(stderr, "Out of memory!");
-		exit(-1);
-	}
-	return ptr;
 }
 
 static void swap_float(float* a, float* b)
