@@ -971,22 +971,24 @@ void ct_translation_pop()
 	matrix_stack.size--;
 }
 
-float* current_matrix()
+CT_Trans* current_trans()
 {
-	return matrix_stack.stack[matrix_stack.size].matrix;
+	return &matrix_stack.stack[matrix_stack.size];
 }
 
-/*
-TODO
+float* current_matrix()
+{
+	return current_trans()->matrix;
+}
+
 void ct_camera_rect(float* rect)
 {
-	CT_Camera* cam = current_camera();
-	float l = 1 / cam->scale;
-	float x = cam->position[0];
-	float y = cam->position[1];
+	CT_Trans* trans = current_trans();
+	float l = 1 / trans->scale;
+	float x = trans->position[0];
+	float y = trans->position[1];
 	rect[0] = (1-(l/2)-.5)+x;
 	rect[1] = rect[0] + l;
 	rect[2] = (1-(l/2)-.5)+y;
 	rect[3] = rect[2] + l;
 }
-*/
