@@ -245,15 +245,15 @@ SOFTWARE.
 (bind-coati string->texture texture (font unsigned-int c-string f32vector))
 
 ;; Camera
-(bind-coati %camera:push void (f32vector float float))
-(bind-coati %camera:pop void ())
-; Note that camera's do not nest.
-(define-syntax with-camera
+(bind-coati %translation:push void (f32vector float float))
+(bind-coati %translation:pop void ())
+; Note that translation's do not nest.
+(define-syntax with-translation
   (syntax-rules ()
     ((_ (position scale rotation) form ...)
-     (begin (%camera:push position scale rotation) form ... (%camera:pop)))))
+     (begin (%translation:push position scale rotation) form ... (%translation:pop)))))
 ; Returns the screens bb ignoring rotation
-(bind-coati camera:rect (f32vector 4) ())
+;;(bind-coati translation:rect (f32vector 4) ())
 
 ;; Trans
 (define (trans:create source-rect #!optional

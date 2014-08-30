@@ -29,7 +29,7 @@ static void push_everything(CT_Texture* target,
 {
 	ct_target_push(target);
 	ct_colour_push(colour);
-	ct_camera_push(pos, scale, rotation);
+	ct_translation_push(pos, scale, rotation);
 	ct_blend_mode_push(blend_mode);
 }
 
@@ -37,7 +37,7 @@ static void pop_everything()
 {
 	ct_target_pop();
 	ct_colour_pop();
-	ct_camera_pop();
+	ct_translation_pop();
 	ct_blend_mode_pop();
 }
 
@@ -628,14 +628,14 @@ static GLushort rect_index_order[] = { 0, 1, 2, 0, 2, 3 };
 
 static void vertex_data(CT_Transformation* tran, float* data);
 
-static float* camera_matrix();
+static float* current_matrix();
 
 void ct_texture_render(CT_Texture* tex, CT_Transformation* trans)
 {
 	float data[16]; vertex_data(trans, data);
 	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), camera_matrix());
+	shader_upload_modelview_matrix(default_shader(), current_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, data);
@@ -736,7 +736,7 @@ void ct_batch_render(CT_Batch* batch, CT_Texture* atlas)
 	DV_Vector* vector = batch->vector;
 	glUseProgram(default_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, atlas->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), camera_matrix());
+	shader_upload_modelview_matrix(default_shader(), current_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, vector->data);
@@ -904,82 +904,56 @@ static void vertex_data(CT_Transformation* tran, float* data)
 	}
 }
 
-/* Camera */
-
-typedef struct _CT_Camera
-{
-	float matrix[16];
-	float position[2];
-	float scale;
-	float rotation;
-} CT_Camera;
+/* Translation */
 
 static struct
 {
-	CT_Camera default_cam;
-	CT_Camera stack[CT_MAX_CAMERA_STACK_SIZE];
+	float stack[16][CT_MAX_MATRIX_STACK_SIZE];
 	unsigned size;
-} camera_stack = {
-	.default_cam =
-	{{ 1, 0, 0, 0,
-	   0, 1, 0, 0,
-	   0, 0, 1, 0,
-	   0, 0, 0, 1 },
-	 {0, 0}, 1, 0}};
+} matrix_stack = {{{
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1 }}, 0};
 
-static CT_Camera* current_camera()
+
+void ct_translation_push(float* position, float scale, float rotation)
 {
-	return camera_stack.size
-		? &camera_stack.stack[camera_stack.size-1]
-		: &camera_stack.default_cam;
-
-}
-
-static float* camera_matrix()
-{
-	return current_camera()->matrix;
-}
-
-static void adjust_camera_matrix(CT_Camera* cam,
-				 float* position, float scale, float rotation)
-{
-	hpmIdentityMat4(cam->matrix);
-	hpmTranslate(position[0]-.5, position[1]-.5, 0, cam->matrix);
-	hpmRotateZ(rotation, cam->matrix);
-	hpmScale2D(scale, scale, cam->matrix);
-	hpmTranslate(.5, .5, 0, cam->matrix);
-}
-
-void ct_camera_push(float* position, float scale, float rotation)
-{
-	if (camera_stack.size >= CT_MAX_CAMERA_STACK_SIZE)
+	if (matrix_stack.size >= CT_MAX_MATRIX_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
 		ct_set_error("Stack overflow");
-		camera_stack.size = 0;
+		matrix_stack.size = 0;
 	}
-	CT_Camera* cam = &camera_stack.stack[camera_stack.size++];
-	adjust_camera_matrix(cam, position, scale, rotation);
-	cam->position[0] = position[0];
-	cam->position[1] = position[1];
-	cam->scale = scale;
-	cam->rotation = rotation;
+	float* matrix = matrix_stack.stack[++matrix_stack.size];
+	hpmIdentityMat4(matrix);
+	hpmTranslate(position[0]-.5, position[1]-.5, 0, matrix);
+	hpmRotateZ(rotation, matrix);
+	hpmScale2D(scale, scale, matrix);
+	hpmTranslate(.5, .5, 0, matrix);
 }
 
-void ct_camera_pop()
+void ct_translation_pop()
 {
-	if (camera_stack.size == 0)
+	if (matrix_stack.size == 0)
 	{
 		/* Stack underflow, setting stack to one
 		   so it will set to default value if this
 		   error is ignored. */
 		ct_set_error("Stack underflow");
-		camera_stack.size = 1;
+		matrix_stack.size = 1;
 	}
-	camera_stack.size--;
+	matrix_stack.size--;
 }
 
+float* current_matrix()
+{
+	return matrix_stack.stack[matrix_stack.size];
+}
+
+/*
+TODO
 void ct_camera_rect(float* rect)
 {
 	CT_Camera* cam = current_camera();
@@ -991,3 +965,4 @@ void ct_camera_rect(float* rect)
 	rect[2] = (1-(l/2)-.5)+y;
 	rect[3] = rect[2] + l;
 }
+*/

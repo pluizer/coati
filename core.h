@@ -5,6 +5,7 @@
 #define CT_MAX_BLEND_STACK_SIZE   32
 #define CT_MAX_COLOUR_STACK_SIZE  32
 #define CT_MAX_CAMERA_STACK_SIZE  32
+#define CT_MAX_MATRIX_STACK_SIZE  32
 
 #include <stdio.h>
 
@@ -175,11 +176,16 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 
 /* Camera */
 
-extern void ct_camera_push(float* position, float scale, float rotation);
+/* extern void ct_camera_push(float* position, float scale, float rotation); */
 
-extern void ct_camera_pop();
+/* extern void ct_camera_pop(); */
 
-/* Returns the screens bb ignoring rotation */
-extern void ct_camera_rect(float* rect);
+/* /\* Returns the screens bb ignoring rotation *\/ */
+/* extern void ct_camera_rect(float* rect); */
+
+/* Translation */
+extern void ct_translation_push(float* position, float scale, float rotation);
+
+extern void ct_translation_pop();
 
 #endif /* __core_h__ */	
