@@ -391,8 +391,8 @@ SOFTWARE.
   (batch:render (sprite-batch:%batch sbatch) texture))
 
 (define (sprite-batch:clear sbatch)
-  (for-each (lambda (handle)
-	      (handle remove: #t))
+  (for-each (lambda (handle-pair)
+	      ((cdr handle-pair) remove: #t))
 	    (sprite-batch:%handles sbatch)))
 
 ;; Keys
