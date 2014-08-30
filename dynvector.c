@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include "dynvector.h"
+#include "aux.h"
 
 typedef struct _DV_IndexStack
 {
@@ -13,8 +14,8 @@ typedef struct _DV_IndexStack
 
 DV_IndexStack* new_index_stack(unsigned size_hint)
 {
-	DV_IndexStack* is = malloc(sizeof(DV_IndexStack));
-	is->data = malloc(sizeof(unsigned) * size_hint);
+	DV_IndexStack* is = smalloc(sizeof(DV_IndexStack));
+	is->data = smalloc(sizeof(unsigned) * size_hint);
 	is->size_hint = size_hint;
 	is->size = 0;
 	return is;
@@ -29,7 +30,7 @@ void free_index_stack(DV_IndexStack* is)
 void index_stack_grow(DV_IndexStack* is)
 {
 	is->size_hint *= 2;
-	is->data = realloc(is->data, sizeof(unsigned) * is->size_hint);
+	is->data = srealloc(is->data, sizeof(unsigned) * is->size_hint);
 }
 
 void index_stack_push(DV_IndexStack* is, unsigned index)
@@ -54,16 +55,16 @@ unsigned index_stack_pop(DV_IndexStack* is)
 
 DV_Vector* dv_vector_new(unsigned chunk_size, unsigned size_hint)
 {
-	DV_Vector* dv = malloc(sizeof(DV_Vector));
+	DV_Vector* dv = smalloc(sizeof(DV_Vector));
 	assert(dv);
-	dv->indices = malloc(sizeof(unsigned)*size_hint);
+	dv->indices = smalloc(sizeof(unsigned)*size_hint);
 	memset(dv->indices, 0, sizeof(unsigned)*size_hint);
 	dv->available_stack = new_index_stack(size_hint);
 	dv->last_stack = new_index_stack(size_hint);
 	dv->size = 0;
 	dv->size_hint = size_hint;
 	dv->chunk_size = chunk_size;
-	dv->data = malloc(dv->chunk_size * sizeof(float) * size_hint);
+	dv->data = smalloc(dv->chunk_size * sizeof(float) * size_hint);
 	memset(dv->data, 0, dv->chunk_size * sizeof(float) * size_hint);
 	return dv;
 }
@@ -81,9 +82,9 @@ unsigned vector_grow(DV_Vector* dv)
 {
 	unsigned old_max = dv->size_hint;
 	dv->size_hint *= 2;
-	dv->data = realloc(dv->data, 
+	dv->data = srealloc(dv->data, 
 			   dv->chunk_size * sizeof(float) * dv->size_hint);
-	dv->indices = realloc(dv->indices, sizeof(unsigned) * dv->size_hint);
+	dv->indices = srealloc(dv->indices, sizeof(unsigned) * dv->size_hint);
 	memset(dv->indices+old_max, 0, sizeof(unsigned)*old_max);
 	return dv->size_hint - old_max;
 }
