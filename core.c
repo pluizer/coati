@@ -936,7 +936,11 @@ void ct_translation_push(float* position, float scale, float rotation)
 		matrix_stack.size = 0;
 	}
 	float* matrix = matrix_stack.stack[++matrix_stack.size];
-	hpmIdentityMat4(matrix);
+	memcpy(matrix_stack.stack[matrix_stack.size],
+	       matrix_stack.stack[matrix_stack.size-1],
+	       sizeof(float)*16);
+
+//	hpmIdentityMat4(matrix);
 	hpmTranslate(position[0]-.5, position[1]-.5, 0, matrix);
 	hpmRotateZ(rotation, matrix);
 	hpmScale2D(scale, scale, matrix);
