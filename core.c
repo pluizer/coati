@@ -915,15 +915,23 @@ static void vertex_data(CT_Transformation* tran, float* data)
 
 /* Translation */
 
+typedef struct _CT_Trans
+{
+	float matrix[16];
+	float position[2];
+	float scale;
+} CT_Trans;
+
 static struct
 {
-	float stack[16][CT_MAX_MATRIX_STACK_SIZE];
+	CT_Trans stack[CT_MAX_MATRIX_STACK_SIZE];
 	unsigned size;
-} matrix_stack = {{{
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1 }}, 0};
+} matrix_stack = {
+	{{ 1, 0, 0, 0,
+	   0, 1, 0, 0,
+	   0, 0, 1, 0,
+	   0, 0, 0, 1 },
+	 { 0, 0 }, 1 }, 0 };
 
 
 void ct_translation_push(float* position, float scale, float rotation)
@@ -935,16 +943,19 @@ void ct_translation_push(float* position, float scale, float rotation)
 		ct_set_error("Stack overflow");
 		matrix_stack.size = 0;
 	}
-	float* matrix = matrix_stack.stack[++matrix_stack.size];
-	memcpy(matrix_stack.stack[matrix_stack.size],
-	       matrix_stack.stack[matrix_stack.size-1],
-	       sizeof(float)*16);
+	CT_Trans* trans = &matrix_stack.stack[++matrix_stack.size];
+	memcpy(&matrix_stack.stack[matrix_stack.size],
+	       &matrix_stack.stack[matrix_stack.size-1],
+	       sizeof(CT_Trans));
 
-//	hpmIdentityMat4(matrix);
-	hpmTranslate(position[0]-.5, position[1]-.5, 0, matrix);
-	hpmRotateZ(rotation, matrix);
-	hpmScale2D(scale, scale, matrix);
-	hpmTranslate(.5, .5, 0, matrix);
+	hpmTranslate(position[0]-.5, position[1]-.5, 0, trans->matrix);
+	hpmRotateZ(rotation, trans->matrix);
+	hpmScale2D(scale, scale, trans->matrix);
+	hpmTranslate(.5, .5, 0, trans->matrix);
+
+	trans->position[0] = position[0];
+	trans->position[1] = position[1];
+	trans->scale       = scale;
 }
 
 void ct_translation_pop()
@@ -962,7 +973,7 @@ void ct_translation_pop()
 
 float* current_matrix()
 {
-	return matrix_stack.stack[matrix_stack.size];
+	return matrix_stack.stack[matrix_stack.size].matrix;
 }
 
 /*
