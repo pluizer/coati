@@ -38,7 +38,6 @@ static void key_pop(CT_Key key, InputStack* stack)
 		if (stack->stack[i] == key)
 		{
 			stack->stack[i] = 0;
-			return;
 		}
 	}
 }
@@ -50,7 +49,6 @@ static void key_down_callback(Uint8 key)
 
 static void key_up_callback(Uint8 key)
 {
-
 	key_pop(key, &holded_stack);
 	key_push(key, &released_stack);
 }
