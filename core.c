@@ -926,13 +926,22 @@ static struct
 {
 	CT_Trans stack[CT_MAX_MATRIX_STACK_SIZE];
 	unsigned size;
-} matrix_stack = {
-	{{ 1, 0, 0, 0,
-	   0, 1, 0, 0,
-	   0, 0, 1, 0,
-	   0, 0, 0, 1 },
-	 { 0, 0 }, 1 }, 0 };
-
+} matrix_stack =
+{
+	.stack =
+	{{
+		.matrix =
+		{
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		},
+		.position = { 0, 0 },
+		.scale    = 1 
+	}},
+	.size = 0
+};
 
 void ct_translation_push(float* position, float scale, float rotation)
 {
@@ -944,9 +953,9 @@ void ct_translation_push(float* position, float scale, float rotation)
 		matrix_stack.size = 0;
 	}
 	CT_Trans* trans = &matrix_stack.stack[++matrix_stack.size];
-	memcpy(&matrix_stack.stack[matrix_stack.size],
-	       &matrix_stack.stack[matrix_stack.size-1],
-	       sizeof(CT_Trans));
+	memcpy(&matrix_stack.stack[matrix_stack.size].matrix,
+	       &matrix_stack.stack[matrix_stack.size-1].matrix,
+	       sizeof(float)*16);
 
 	hpmTranslate(position[0]-.5, position[1]-.5, 0, trans->matrix);
 	hpmRotateZ(rotation, trans->matrix);
