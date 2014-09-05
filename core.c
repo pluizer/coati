@@ -112,17 +112,6 @@ const char* fragment_shader_source =
 		"fragment = texture2D(texture, f_coord.st) * f_colour; "
 	"}";
 
-
-const char* fragment_shader_source2 =
-	"#version 330\n"
-	"uniform sampler2D texture; "
-	"in vec4 f_colour; "
-	"in vec2 f_coord; "
-	"out vec4 fragment; "
-	"void main() { "
-		"fragment = texture2D(texture, f_coord.st) * f_colour; "
-	"}";
-
 const char* fragment_shader_blur_source = 
 	"#version 330\n"
 	"uniform sampler2D texture; "
@@ -152,7 +141,6 @@ const char* fragment_shader_blur_source =
 			"* 0.05; "
 		"fragment = sum * f_colour; "
  	"}";
-
 
 static GLuint compile_shader(const char* source, GLuint type, int* success)
 {
@@ -547,7 +535,7 @@ static void set_blend_mode(CT_BlendMode mode)
 		glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 	case CT_BLEND_MODE_ONE_ONE:
-		glBlendFunc(GL_ONE, GL_ZERO);
+		glBlendFunc(GL_ONE, GL_ONE);
 		break;
 	}
 }

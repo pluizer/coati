@@ -169,6 +169,10 @@ SOFTWARE.
   (syntax-rules ()
     ((_ form ...)
      (begin (%push-blur-shader) form ... (%shader:pop)))))
+(define-syntax with-shadow-shader
+  (syntax-rules ()
+    ((_ form ...)
+     (begin (%push-shadow-shader) form ... (%shader:pop)))))
 
 ;; Window
 (bind-coati window:init bool ())
