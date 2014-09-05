@@ -102,7 +102,17 @@ const char* vertex_shader_source =
 		"f_colour = colour; "
 	"}";
 
-const char* fragment_shader_source =
+/* const char* fragment_shader_source = */
+/* 	"#version 330\n" */
+/* 	"uniform sampler2D texture; " */
+/* 	"in vec4 f_colour; " */
+/* 	"in vec2 f_coord; " */
+/* 	"out vec4 fragment; " */
+/* 	"void main() { " */
+/* 		"fragment = texture2D(texture, f_coord.st) * f_colour; " */
+/* 	"}"; */
+
+const char* fragment_shader_source = 
 	"#version 330\n"
 	"uniform sampler2D texture; "
 	"in vec4 f_colour; "
@@ -110,36 +120,6 @@ const char* fragment_shader_source =
 	"out vec4 fragment; "
 	"void main() { "
 		"fragment = texture2D(texture, f_coord.st) * f_colour; "
-	"}";
-
-const char* fragment_shader_blur_source = 
-	"#version 330\n"
-	"uniform sampler2D texture; "
-	"const float size = 1.0/512.0; "
-	"in vec4 f_colour; "
-	"in vec2 f_coord; "
-	"out vec4 fragment; "
-	"void main() { "
-		"vec4 sum = vec4(0.0); "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 4.0*size)) "
-			"* 0.05; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 3.0*size)) "
-			"* 0.09; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 2.0*size)) "
-			"* 0.12; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - size)) "
-			"* 0.15; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y)) "
-			"* 0.16; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + size)) "
-			" * 0.15;"
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 2.0"
-			"*size)) * 0.12; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 3.0*size)) "
-			"* 0.09; "
-		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 4.0*size)) "
-			"* 0.05; "
-		"fragment = sum * f_colour; "
  	"}";
 
 static GLuint compile_shader(const char* source, GLuint type, int* success)
@@ -234,8 +214,6 @@ static void shader_free(CT_Shader* shader)
 
 static CT_Shader* _default_shader;
 
-static CT_Shader* _blur_shader;
-
 static struct
 {
 	CT_Shader* stack[CT_MAX_SHADER_STACK_SIZE];
@@ -258,11 +236,6 @@ static void shader_push(CT_Shader* shader)
 void ct_push_default_shader()
 {
 	shader_push(_default_shader);
-}
-
-void ct_push_blur_shader()
-{
-	shader_push(_blur_shader);
 }
 
 void ct_shader_pop()
@@ -328,16 +301,6 @@ int ct_window_init()
 	}
 	shader_upload_colour(_default_shader, colour_white);
 
-	/* Initialise Blur Shader */
-	_blur_shader = shader_create(
-		vertex_shader_source, fragment_shader_blur_source);
-	if (!_blur_shader)
-	{
-		ct_set_error("Could not create blur shader.");
-		return 1;
-	}
-	shader_upload_colour(_blur_shader, colour_white);
-
 	/* Make sure first shader is always the default shader */
 	/* This one cannot be removed by ct_shader_pop() */
 	ct_push_default_shader();
@@ -350,7 +313,6 @@ void ct_window_quit()
 {
 	SDL_DestroyWindow(window.sdl_window);
 	shader_free(_default_shader);
-	shader_free(_blur_shader);
 	SDL_Quit();
 }
 

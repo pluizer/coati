@@ -77,8 +77,6 @@ extern void ct_set_error(const char* str);
 
 extern void ct_push_default_shader();
 
-extern void ct_push_blur_shader();
-
 extern void ct_shader_pop();
 
 /* Window */
