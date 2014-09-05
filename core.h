@@ -6,6 +6,7 @@
 #define CT_MAX_COLOUR_STACK_SIZE  32
 #define CT_MAX_CAMERA_STACK_SIZE  32
 #define CT_MAX_MATRIX_STACK_SIZE  32
+#define CT_MAX_SHADER_STACK_SIZE  32
 
 #include <stdio.h>
 
@@ -71,6 +72,14 @@ typedef struct _CT_Font
 extern const char* ct_get_error();
 
 extern void ct_set_error(const char* str);
+
+/* Shader */
+
+extern void ct_push_default_shader();
+
+extern void ct_push_blur_shader();
+
+extern void ct_shader_pop();
 
 /* Window */
 

@@ -157,6 +157,19 @@ SOFTWARE.
 (bind-coati get-error c-string ())
 (bind-coati set-error void (c-string))
 
+;; Shader
+(bind-coati %push-default-shader void ())
+(bind-coati %push-blur-shader void ())
+(bind-coati %shader:pop void ())
+(define-syntax with-default-shader
+  (syntax-rules ()
+    ((_ form ...)
+     (begin (%push-default-shader) form ... (%shader:pop)))))
+(define-syntax with-blur-shader
+  (syntax-rules ()
+    ((_ form ...)
+     (begin (%push-blur-shader) form ... (%shader:pop)))))
+
 ;; Window
 (bind-coati window:init bool ())
 (bind-coati window:quit void ())

@@ -112,6 +112,48 @@ const char* fragment_shader_source =
 		"fragment = texture2D(texture, f_coord.st) * f_colour; "
 	"}";
 
+
+const char* fragment_shader_source2 =
+	"#version 330\n"
+	"uniform sampler2D texture; "
+	"in vec4 f_colour; "
+	"in vec2 f_coord; "
+	"out vec4 fragment; "
+	"void main() { "
+		"fragment = texture2D(texture, f_coord.st) * f_colour; "
+	"}";
+
+const char* fragment_shader_blur_source = 
+	"#version 330\n"
+	"uniform sampler2D texture; "
+	"const float size = 1.0/512.0; "
+	"in vec4 f_colour; "
+	"in vec2 f_coord; "
+	"out vec4 fragment; "
+	"void main() { "
+		"vec4 sum = vec4(0.0); "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 4.0*size)) "
+			"* 0.05; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 3.0*size)) "
+			"* 0.09; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - 2.0*size)) "
+			"* 0.12; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y - size)) "
+			"* 0.15; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y)) "
+			"* 0.16; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + size)) "
+			" * 0.15;"
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 2.0"
+			"*size)) * 0.12; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 3.0*size)) "
+			"* 0.09; "
+		"sum += texture2D(texture, vec2(f_coord.x, f_coord.y + 4.0*size)) "
+			"* 0.05; "
+		"fragment = sum * f_colour; "
+ 	"}";
+
+
 static GLuint compile_shader(const char* source, GLuint type, int* success)
 {
 	GLuint shader = glCreateShader(type);
@@ -174,13 +216,17 @@ static void shader_upload_projection_matrix(CT_Shader* shader, float* matrix)
 	CHECK_GL();
 }
 
-static CT_Shader* ct_shader_create(const char* vertex_source,
+static CT_Shader* shader_create(const char* vertex_source,
 		      const char* fragment_source)
 {
 	int success;
-	GLuint vertex   = compile_shader(vertex_source,   GL_VERTEX_SHADER,   &success);
+	GLuint vertex = compile_shader(vertex_source,
+				       GL_VERTEX_SHADER,
+				       &success);
 	if (!success) return NULL;
-	GLuint fragment = compile_shader(fragment_source, GL_FRAGMENT_SHADER, &success);
+	GLuint fragment = compile_shader(fragment_source,
+					 GL_FRAGMENT_SHADER,
+					 &success);
 	if (!success) return NULL;
 	GLuint program  = create_shader_program(vertex, fragment, &success);
 	if (!success) return NULL;
@@ -193,17 +239,63 @@ static CT_Shader* ct_shader_create(const char* vertex_source,
 	return shader;
 }
 
-static void ct_shader_free(CT_Shader* shader)
+static void shader_free(CT_Shader* shader)
 {
 	free(shader);
 }
 
 static CT_Shader* _default_shader;
 
-static CT_Shader* default_shader()
+static CT_Shader* _blur_shader;
+
+static struct
 {
-	return _default_shader;
+	CT_Shader* stack[CT_MAX_SHADER_STACK_SIZE];
+	unsigned size;
+} shader_stack;
+
+static void shader_push(CT_Shader* shader)
+{
+	if (shader_stack.size >= CT_MAX_SHADER_STACK_SIZE)
+	{
+		/* Stack overflow, resetting stack to prevent
+		   crashing if this error is ignored. */
+		ct_set_error("Stack overflow");
+		shader_stack.size = 0;
+	}
+	shader_stack.stack[shader_stack.size++] = shader;
+	glUseProgram(shader->gl_program_id);
 }
+
+void ct_push_default_shader()
+{
+	shader_push(_default_shader);
+}
+
+void ct_push_blur_shader()
+{
+	shader_push(_blur_shader);
+}
+
+void ct_shader_pop()
+{
+	/* First item is default shader pushed by ct_window_init() */
+	if (shader_stack.size == 1) 
+	{
+		/* Stack underflow, setting stack to one
+		   so it will set to default value if this
+		   error is ignored. */
+		ct_set_error("Stack underflow");
+		shader_stack.size = 1;
+	}
+	shader_stack.size--;
+}
+
+static CT_Shader* current_shader()
+{
+	return shader_stack.stack[shader_stack.size-1];
+}
+
 
 /* Window */
 
@@ -239,8 +331,29 @@ int ct_window_init()
 	}
 
 	/* Initialise Default Shader */
-	_default_shader = ct_shader_create(vertex_shader_source, fragment_shader_source);
-	shader_upload_colour(default_shader(), colour_white);
+	_default_shader = shader_create(
+		vertex_shader_source, fragment_shader_source);
+	if (!_default_shader)
+	{
+		ct_set_error("Could not create default shader.");
+		return 1;
+	}
+	shader_upload_colour(_default_shader, colour_white);
+
+	/* Initialise Blur Shader */
+	_blur_shader = shader_create(
+		vertex_shader_source, fragment_shader_blur_source);
+	if (!_blur_shader)
+	{
+		ct_set_error("Could not create blur shader.");
+		return 1;
+	}
+	shader_upload_colour(_blur_shader, colour_white);
+
+	/* Make sure first shader is always the default shader */
+	/* This one cannot be removed by ct_shader_pop() */
+	ct_push_default_shader();
+
 	CHECK_GL();
 	return 0;
 }
@@ -248,7 +361,8 @@ int ct_window_init()
 void ct_window_quit()
 {
 	SDL_DestroyWindow(window.sdl_window);
-	ct_shader_free(default_shader());
+	shader_free(_default_shader);
+	shader_free(_blur_shader);
 	SDL_Quit();
 }
 
@@ -384,7 +498,7 @@ void ct_colour_push(float* colour)
 	       colour,
 	       sizeof(float)*4);
 	colour_stack.size++;
-	shader_upload_colour(default_shader(), colour);
+	shader_upload_colour(current_shader(), colour);
 }
 
 void ct_colour_pop()
@@ -400,10 +514,10 @@ void ct_colour_pop()
 	colour_stack.size--;
 	if (colour_stack.size == 0)
 	{
-		shader_upload_colour(default_shader(), colour_white);
+		shader_upload_colour(current_shader(), colour_white);
 	} else
 	{
-		shader_upload_colour(default_shader(), colour_stack.stack+(colour_stack.size*4));
+		shader_upload_colour(current_shader(), colour_stack.stack+(colour_stack.size*4));
 	}
 }
 
@@ -596,7 +710,7 @@ static void texture_bind(CT_Texture* tex)
 	/* Put origin origin at 0,0 */
 	hpmTranslation(-.5, -.5, 0, project_matrix);
 	hpmScale2D(2, ct_is_texture_screen(tex) ? -2 : 2, project_matrix);
-	shader_upload_projection_matrix(default_shader(), project_matrix);
+	shader_upload_projection_matrix(current_shader(), project_matrix);
 	glBindFramebuffer(GL_FRAMEBUFFER, tex->gl_buffer_id);
 	CHECK_GL();
 }
@@ -623,9 +737,9 @@ static float* current_matrix();
 void ct_texture_render(CT_Texture* tex, CT_Transformation* trans)
 {
 	float data[16]; vertex_data(trans, data);
-	glUseProgram(default_shader()->gl_program_id);
+	glUseProgram(current_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), current_matrix());
+	shader_upload_modelview_matrix(current_shader(), current_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, data);
@@ -743,9 +857,9 @@ void ct_batch_change(CT_Batch* batch, unsigned id, CT_Transformation* trans)
 void ct_batch_render(CT_Batch* batch, CT_Texture* atlas)
 {
 	DV_Vector* vector = batch->vector;
-	glUseProgram(default_shader()->gl_program_id);
+	glUseProgram(current_shader()->gl_program_id);
 	glBindTexture(GL_TEXTURE_2D, atlas->gl_texture_id);
-	shader_upload_modelview_matrix(default_shader(), current_matrix());
+	shader_upload_modelview_matrix(current_shader(), current_matrix());
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, vector->data);
