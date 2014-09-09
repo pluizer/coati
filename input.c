@@ -44,7 +44,7 @@ static void key_pop(CT_Key key, InputStack* stack)
 
 static void key_down_callback(Uint8 key)
 {
-	key_push(key, &pressed_stack);
+	if (!has_key(key, &holded_stack)) key_push(key, &pressed_stack);
 }
 
 static void key_up_callback(Uint8 key)

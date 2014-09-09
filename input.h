@@ -1,7 +1,7 @@
 #ifndef __input_h__
 #define __input_h__
 
-#define CT_MAX_INPUT_STACK_SIZE 32
+#define CT_MAX_INPUT_STACK_SIZE 8
 
 typedef enum _CT_Key
 {
