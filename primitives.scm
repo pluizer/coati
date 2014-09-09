@@ -230,10 +230,34 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
 
 (define (coord:create x y)
   (s32vector x y))
+
 (define (coord:x c)
   (s32vector-ref c 0))
+
 (define (coord:y c)
   (s32vector-ref c 1))
+
+; Constant for the zero coord.
+(define (zero-coord)
+  (coord:create 0 0))
+
+; Check if two coords are equal.
+(define (coord=? a b #!optional (epsilon .001))
+  (and (< (abs (- (coord:x a) (coord:x b))) epsilon)
+       (< (abs (- (coord:x a) (coord:y b))) epsilon)))
+
+; Add two coords.
+(define (coord+ a b)
+  (coord:create (+ (coord:x a) (coord:x b))
+	     (+ (coord:y a) (coord:y b))))
+
+; Subtract two coords or negate a coord.
+(define (coord- a #!optional b)
+  (if b (coord:create (- (coord:x a) (coord:x b))
+		   (- (coord:y a) (coord:y b)))
+      (coord:create (- (coord:x a))
+		   (- (coord:y a)))))
+
 
 ;-------------------------------------------------------
 ; Bounding Boxes

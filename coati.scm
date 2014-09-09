@@ -25,7 +25,6 @@ SOFTWARE.
 	(import chicken scheme foreign extras irregex)
 	(use srfi-1 data-structures srfi-4 foreigners mystruct lolevel)
 	(import-for-syntax matchable clojurian-syntax)
-	(include "primitives.scm")
 #>
 #include "audio.h"
 #include "core.h"
@@ -546,5 +545,11 @@ SOFTWARE.
   (button:wheeldown CT_BUTTON_WHEELDOWN)
   (button:x1 CT_BUTTON_X1)
   (button:x2 CT_BUTTON_X2))
+
+;; Primitive functions
+(include "primitives.scm")
+
+;; Tilemap
+(include "tilemap.scm")
 
 )
