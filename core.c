@@ -11,22 +11,12 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-/* Constants */
-
-static float colour_white[4] = { 1, 1, 1, 1 };
-
 /* Utils */
 
-#ifdef DEBUG
-#define CHECK_GL() check_gl_error(__func__);
-#else
-#define CHECK_GL()
-#endif
-
 static void push_everything(CT_Texture* target, 
-			    float* colour, 
-			    float* pos, float scale, float rotation,
-			    CT_BlendMode blend_mode)
+		     float* colour, 
+		     float* pos, float scale, float rotation,
+		     CT_BlendMode blend_mode)
 {
 	ct_target_push(target);
 	ct_colour_push(colour);
@@ -42,29 +32,9 @@ static void pop_everything()
 	ct_blend_mode_pop();
 }
 
-static void swap_float(float* a, float* b)
-{
-	float t = *a;
-	*a = *b;
-	*b = t;
-}
+/* Constants */
 
-static int zeroish(float v)
-{
-	return (v < .0001 && v > -.0001);
-}
-
-#ifdef DEBUG
-static void check_gl_error(const char* func)
-{
-	GLuint err = glGetError();
-	if (err != GL_NO_ERROR)
-	{
-		fprintf(stderr, "%s: OpenGL error: %s\n", func, gluErrorString(err));
-		exit(-1);
-	}
-}
-#endif
+static float colour_white[4] = { 1, 1, 1, 1 };
 
 /* Error */
 
@@ -78,16 +48,10 @@ void ct_set_error(const char* str)
 	SDL_SetError(str);
 }
 
-/* Shader */
 
-typedef struct
-{
-	unsigned gl_program_id;
-	unsigned gl_vertex_id;
-	unsigned gl_fragment_id;
-} CT_Shader;
+/* Default shader */
 
-const char* vertex_shader_source = 
+static const char* vertex_shader_source = 
 	"#version 330\n"
 	"layout (location = 0) in vec2 vertex; "
 	"layout (location = 1) in vec2 coord; "
@@ -102,17 +66,7 @@ const char* vertex_shader_source =
 		"f_colour = colour; "
 	"}";
 
-/* const char* fragment_shader_source = */
-/* 	"#version 330\n" */
-/* 	"uniform sampler2D texture; " */
-/* 	"in vec4 f_colour; " */
-/* 	"in vec2 f_coord; " */
-/* 	"out vec4 fragment; " */
-/* 	"void main() { " */
-/* 		"fragment = texture2D(texture, f_coord.st) * f_colour; " */
-/* 	"}"; */
-
-const char* fragment_shader_source = 
+static const char* fragment_shader_source = 
 	"#version 330\n"
 	"uniform sampler2D texture; "
 	"in vec4 f_colour; "
@@ -121,6 +75,13 @@ const char* fragment_shader_source =
 	"void main() { "
 		"fragment = texture2D(texture, f_coord.st) * f_colour; "
  	"}";
+
+typedef struct
+{
+	unsigned gl_program_id;
+	unsigned gl_vertex_id;
+	unsigned gl_fragment_id;
+} CT_Shader;
 
 static GLuint compile_shader(const char* source, GLuint type, int* success)
 {
@@ -163,29 +124,8 @@ static GLuint create_shader_program(GLuint vertex, GLuint fragment, int* success
 	return prog;
 }
 
-static void shader_upload_colour(CT_Shader* shader, float* colour)
-{
-	glUniform4fv(glGetUniformLocation(shader->gl_program_id, "colour"),
-		     1, colour);
-	CHECK_GL();
-}
-
-static void shader_upload_modelview_matrix(CT_Shader* shader, float* matrix)
-{
-	glUniformMatrix4fv(glGetUniformLocation(shader->gl_program_id, "modelview"),
-			   1, GL_FALSE, matrix);
-	CHECK_GL();
-}
-
-static void shader_upload_projection_matrix(CT_Shader* shader, float* matrix)
-{
-	glUniformMatrix4fv(glGetUniformLocation(shader->gl_program_id, "projection"),
-			   1, GL_FALSE, matrix);
-	CHECK_GL();
-}
-
 static CT_Shader* shader_create(const char* vertex_source,
-		      const char* fragment_source)
+			 const char* fragment_source)
 {
 	int success;
 	GLuint vertex = compile_shader(vertex_source,
@@ -212,17 +152,40 @@ static void shader_free(CT_Shader* shader)
 	free(shader);
 }
 
+
+static void shader_upload_colour(CT_Shader* shader, float* colour)
+{
+	glUniform4fv(glGetUniformLocation(shader->gl_program_id, "colour"),
+		     1, colour);
+	CHECK_GL();
+}
+
+static void shader_upload_modelview_matrix(CT_Shader* shader, float* matrix)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shader->gl_program_id, "modelview"),
+			   1, GL_FALSE, matrix);
+	CHECK_GL();
+}
+
+static void shader_upload_projection_matrix(CT_Shader* shader, float* matrix)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shader->gl_program_id, "projection"),
+			   1, GL_FALSE, matrix);
+	CHECK_GL();
+}
+
+
 static CT_Shader* _default_shader;
 
 static struct
 {
-	CT_Shader* stack[CT_MAX_SHADER_STACK_SIZE];
+	CT_Shader* stack[CT_STACK_SIZE];
 	unsigned size;
 } shader_stack;
 
 static void shader_push(CT_Shader* shader)
 {
-	if (shader_stack.size >= CT_MAX_SHADER_STACK_SIZE)
+	if (shader_stack.size >= CT_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
@@ -431,13 +394,13 @@ void ct_image_size(CT_Image* image, float* vect)
 
 static struct
 {
-	float stack[CT_MAX_COLOUR_STACK_SIZE*4];
+	float stack[CT_STACK_SIZE*4];
 	unsigned size;
 } colour_stack;
 
 void ct_colour_push(float* colour)
 {
-	if (colour_stack.size >= CT_MAX_COLOUR_STACK_SIZE)
+	if (colour_stack.size >= CT_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
@@ -475,7 +438,7 @@ void ct_colour_pop()
 
 static struct
 {
-	CT_BlendMode stack[CT_MAX_BLEND_STACK_SIZE];
+	CT_BlendMode stack[CT_STACK_SIZE];
 	unsigned size;
 } blend_stack;
 
@@ -504,7 +467,7 @@ static void set_blend_mode(CT_BlendMode mode)
 
 void ct_blend_mode_push(CT_BlendMode mode)
 {
-	if (blend_stack.size >= CT_MAX_BLEND_STACK_SIZE)
+	if (blend_stack.size >= CT_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
@@ -643,12 +606,12 @@ int ct_is_texture_screen(CT_Texture* tex)
 	return tex->gl_buffer_id == 0;
 }
 
-void ct_texture_size(CT_Texture* texture, float* vect)
+void ct_texture_size(CT_Texture* tex, float* vect)
 {
-	if (ct_is_texture_screen(texture)) {
+	if (ct_is_texture_screen(tex)) {
 	}
-	vect[0] = (float)texture->w;
-	vect[1] = (float)texture->h;
+	vect[0] = (float)tex->w;
+	vect[1] = (float)tex->h;
 }
 
 static float project_matrix[16];
@@ -702,7 +665,7 @@ void ct_texture_render(CT_Texture* tex, CT_Transformation* trans)
 
 static struct
 {
-	CT_Texture* stack[CT_MAX_TARGET_STACK_SIZE];
+	CT_Texture* stack[CT_STACK_SIZE];
 	unsigned size;
 } target_stack;
 
@@ -715,7 +678,7 @@ static CT_Texture* current_target()
 
 void ct_target_push(CT_Texture* tex)
 {
-	if (target_stack.size >= CT_MAX_TARGET_STACK_SIZE)
+	if (target_stack.size >= CT_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
@@ -979,60 +942,48 @@ static void vertex_data(CT_Transformation* tran, float* data)
 
 /* Translation */
 
-typedef struct _CT_Trans
-{
-	float matrix[16];
-	float position[2];
-	float scale;
-} CT_Trans;
-
 static struct
 {
-	CT_Trans stack[CT_MAX_MATRIX_STACK_SIZE];
+	float stack[16][CT_STACK_SIZE];
 	unsigned size;
-} matrix_stack =
-{
-	.stack =
-	{{
-		.matrix =
-		{
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		},
-		.position = { 0, 0 },
-		.scale    = 1 
-	}},
-	.size = 0
+} matrix_stack;
+
+float _current_matrix[16] = {
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1
 };
+
+float* current_matrix()
+{
+	return _current_matrix;
+}
 
 void ct_translation_push(float* position, float scale, float rotation)
 {
-	if (matrix_stack.size >= CT_MAX_MATRIX_STACK_SIZE)
+	if (matrix_stack.size >= CT_STACK_SIZE)
 	{
 		/* Stack overflow, resetting stack to prevent
 		   crashing if this error is ignored. */
 		ct_set_error("Stack overflow");
 		matrix_stack.size = 0;
 	}
-	CT_Trans* trans = &matrix_stack.stack[++matrix_stack.size];
-	memcpy(&matrix_stack.stack[matrix_stack.size].matrix,
-	       &matrix_stack.stack[matrix_stack.size-1].matrix,
-	       sizeof(float)*16);
+	float* trans = matrix_stack.stack[++matrix_stack.size];
 
-	hpmTranslate(position[0]-.5, position[1]-.5, 0, trans->matrix);
-	hpmRotateZ(rotation, trans->matrix);
-	hpmScale2D(scale, scale, trans->matrix);
-	hpmTranslate(.5, .5, 0, trans->matrix);
-
-	trans->position[0] = position[0];
-	trans->position[1] = position[1];
-	trans->scale       = scale;
+	hpmIdentityMat4(trans);
+	hpmTranslate(position[0]-.5, position[1]-.5, 0, trans);
+	hpmRotateZ(rotation, trans);
+	hpmScale2D(scale, scale, trans);
+	hpmTranslate(.5, .5, 0, trans);
+	float r[16];
+	hpmMultMat4(_current_matrix, trans, r);
+	memcpy(_current_matrix, r, sizeof(float)*16);
 }
 
 void ct_translation_pop()
 {
+	
 	if (matrix_stack.size == 0)
 	{
 		/* Stack underflow, setting stack to one
@@ -1041,27 +992,12 @@ void ct_translation_pop()
 		ct_set_error("Stack underflow");
 		matrix_stack.size = 1;
 	}
+	float* trans = matrix_stack.stack[matrix_stack.size];
 	matrix_stack.size--;
-}
 
-CT_Trans* current_trans()
-{
-	return &matrix_stack.stack[matrix_stack.size];
-}
-
-float* current_matrix()
-{
-	return current_trans()->matrix;
-}
-
-void ct_screen_rect(float* rect)
-{
-	CT_Trans* trans = current_trans();
-	float l = 1 / trans->scale;
-	float x = trans->position[0];
-	float y = trans->position[1];
-	rect[0] = (1-(l/2)-.5)+x;
-	rect[1] = rect[0] + l;
-	rect[2] = (1-(l/2)-.5)+y;
-	rect[3] = rect[2] + l;
+	float r1[16];
+	float r2[16];
+	hpmInverse(trans, r1);
+	hpmMultMat4(_current_matrix, r1, r2);
+	memcpy(_current_matrix, r2, sizeof(float)*16);
 }

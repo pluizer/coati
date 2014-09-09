@@ -225,6 +225,17 @@ Chipmunk2D's cpVect.h (c) 2007 - Scott Lembcke and Howling Moon Software.
     (vect:spherical-lerp a b (/ (min angle omega) omega))))
 
 ;-------------------------------------------------------
+; Coords
+;-------------------------------------------------------
+
+(define (coord:create x y)
+  (s32vector x y))
+(define (coord:x c)
+  (s32vector-ref c 0))
+(define (coord:y c)
+  (s32vector-ref c 1))
+
+;-------------------------------------------------------
 ; Bounding Boxes
 ;-------------------------------------------------------
 

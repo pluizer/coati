@@ -1,12 +1,7 @@
 #ifndef __core_h__
 #define __core_h__
 
-#define CT_MAX_TARGET_STACK_SIZE  32
-#define CT_MAX_BLEND_STACK_SIZE   32
-#define CT_MAX_COLOUR_STACK_SIZE  32
-#define CT_MAX_CAMERA_STACK_SIZE  32
-#define CT_MAX_MATRIX_STACK_SIZE  32
-#define CT_MAX_SHADER_STACK_SIZE  32
+#define CT_STACK_SIZE 32
 
 #include <stdio.h>
 
@@ -141,7 +136,7 @@ extern void ct_texture_free(CT_Texture* tex);
 
 extern int ct_is_texture_screen(CT_Texture* tex);
 
-extern void ct_texture_size(CT_Texture* texture, float* vect);
+extern void ct_texture_size(CT_Texture* tex, float* vect);
 
 extern void ct_texture_clear(CT_Texture* tex, float* colour);
 
@@ -180,15 +175,6 @@ extern CT_Texture* ct_string_to_texture(CT_Font* font,
 					unsigned size,
 					const char* string,
 					float* colour);
-
-/* Camera */
-
-/* extern void ct_camera_push(float* position, float scale, float rotation); */
-
-/* extern void ct_camera_pop(); */
-
-/* /\* Returns the screens bb ignoring rotation *\/ */
-/* extern void ct_camera_rect(float* rect); */
 
 /* Translation */
 extern void ct_translation_push(float* position, float scale, float rotation);

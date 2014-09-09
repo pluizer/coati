@@ -260,8 +260,6 @@ SOFTWARE.
   (syntax-rules ()
     ((_ (position scale rotation) form ...)
      (begin (%translation:push position scale rotation) form ... (%translation:pop)))))
-; Returns the screens bb ignoring rotation
-(bind-coati screen:rect (f32vector 4) ())
 
 ;; Trans
 (define (trans:create source-rect #!optional
