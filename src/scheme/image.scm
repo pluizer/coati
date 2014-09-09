@@ -1,0 +1,7 @@
+(define-foreign-type image (c-pointer "CT_Image"))
+(bind-coati image:load image (c-string)
+	    (finally %image:free))
+(bind-coati image:create image (unsigned-int unsigned-int)
+	    (finally %image:free))
+(bind-coati %image:free void (image))
+(bind-coati image:size (f32vector 2) (image))

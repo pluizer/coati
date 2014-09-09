@@ -1,0 +1,5 @@
+(define-foreign-type font (c-pointer "CT_Font"))
+(bind-coati %font:free void (font))
+(bind-coati font:load font (c-string)
+ 	    (finally %font:free))
+(bind-coati string->texture texture (font unsigned-int c-string f32vector))

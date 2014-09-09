@@ -1,0 +1,6 @@
+(define-foreign-type sample (c-pointer "CT_Sample"))
+(define-foreign-type channel integer)
+(bind-coati %sample:free void (sample))
+(bind-coati sample:load sample (c-string)
+	    (finally %sample:free))
+(bind-coati sample:play channel (sample f32vector bool))
