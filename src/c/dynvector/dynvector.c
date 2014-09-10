@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include "dynvector.h"
-#include "aux.h"
+#include "../aux.h"
 
 typedef struct _DV_IndexStack
 {

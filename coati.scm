@@ -26,9 +26,9 @@ SOFTWARE.
 	(use srfi-1 data-structures srfi-4 foreigners mystruct lolevel)
 	(import-for-syntax matchable clojurian-syntax)
 #>
-#include "audio.h"
-#include "core.h"
-#include "input.h"
+#include "src/c/audio.h"
+#include "src/c/core.h"
+#include "src/c/input.h"
 #include <float.h>
 <#
 

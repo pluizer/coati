@@ -11,3 +11,10 @@
 /a.out
 /dynvector_test.c
 /#LICENCE#
+/src/c/core.c~
+/aux.c~
+/aux.h~
+/batch.scm~
+/src/c/dynvector/dynvector.c~
+/test.c~
+/transformation.scm~

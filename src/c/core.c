@@ -1,6 +1,6 @@
 #include "core.h"
-#include "hypermath.h"
-#include "dynvector.h"
+#include "hypermath/hypermath.h"
+#include "dynvector/dynvector.h"
 #include "aux.h"
 #include <string.h>
 #include <assert.h>
